@@ -159,7 +159,6 @@ def _add_sweep_subparser(sub: argparse._SubParsersAction) -> None:
 def _cmd_sweep(args: argparse.Namespace) -> int:
     from lab_orchestrator import (  # local import: not always installed at lint time
         Task,
-        build_task_matrix,
         detect_gpus,
         run_schedule,
     )
@@ -221,13 +220,20 @@ def _cmd_sweep(args: argparse.Namespace) -> int:
             "results/exp_a/runs",
         ]
 
+    # LPT weight: estimated wallclock hours per cell on the target GPU
+    # tier (4090 for ResNet-18 / VGG-11, A6000 for ResNet-34) at 30
+    # epochs.  These are the figures used in the plan and let the
+    # scheduler dispatch the heaviest cells first.
+    _ARCH_HOURS: dict[str, float] = {
+        "resnet18": 1.5,
+        "vgg11": 1.0,
+        "resnet34": 2.5,
+    }
+
     tasks: list[Task] = []
     for arch, dataset, noise, seed in cells:
         name = run_slug(arch=arch, dataset=dataset, noise=noise, seed=seed)
-        # LPT weight: ResNet-34 ~ 2x ResNet-18 cost; cifar-100 ~ same; we
-        # use param-count proxy (rough) so the scheduler dispatches the
-        # heaviest first.
-        weight = {"resnet18": 11.0, "vgg11": 28.0, "resnet34": 21.0}.get(arch, 1.0)
+        weight = _ARCH_HOURS.get(arch, 1.0)
         tasks.append(
             Task(
                 weight=weight,
@@ -261,9 +267,6 @@ def _cmd_sweep(args: argparse.Namespace) -> int:
         tasks=tasks,
         workers_per_gpu=args.workers_per_gpu,
     )
-    # Note: build_task_matrix is the canonical factory in lab_orchestrator; we
-    # build tasks manually here because per-cell args are heterogeneous.
-    _ = build_task_matrix  # keep import live for future refactor
     return 0
 
 

@@ -67,6 +67,7 @@ class Trainer:
         weight_decay: float,
         epochs: int,
         scheduler: str = "cosine",
+        grad_clip: float | None = None,
         metric_interval_steps: int = 100,
         hessian_batch_size: int = 128,
         n_probes: int = 10,
@@ -79,6 +80,7 @@ class Trainer:
         self.train_loader = train_loader
         self.val_loader = val_loader
         self.epochs = epochs
+        self.grad_clip = grad_clip
         self.metric_interval_steps = metric_interval_steps
         self.hessian_batch_size = hessian_batch_size
 
@@ -199,9 +201,10 @@ class Trainer:
                     self.optimizer.zero_grad(set_to_none=True)
                     loss = self.loss_fn(self.model(x), y)
                     loss.backward()
-                    torch.nn.utils.clip_grad_norm_(
-                        self.model.parameters(), max_norm=1.0
-                    )
+                    if self.grad_clip is not None:
+                        torch.nn.utils.clip_grad_norm_(
+                            self.model.parameters(), max_norm=self.grad_clip
+                        )
                     self.optimizer.step()
                     if self.scheduler is not None:
                         self.scheduler.step()

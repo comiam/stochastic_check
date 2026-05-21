@@ -14,8 +14,12 @@ class TrainingConfig:
     """Hyperparameters for the training loop.
 
     Defaults follow the protocol in section 7.1 of the paper:
-    SGD(momentum=0.9), lr=0.1, batch_size=128, weight_decay=5e-4,
-    cosine schedule over the full epoch budget.
+    SGD(momentum=0.9), lr=0.1, batch_size=128, weight_decay=5e-4
+    (the standard CIFAR regulariser; its contribution to the layer
+    Hessian is the constant diagonal term :math:`2\\lambda I` and is
+    declared explicitly in the paper to keep the curvature target
+    well-defined), per-step cosine schedule over the full epoch budget,
+    no gradient clipping.
     """
 
     lr: float = 0.1
@@ -24,6 +28,7 @@ class TrainingConfig:
     momentum: float = 0.9
     weight_decay: float = 5e-4
     scheduler: str = "cosine"  # "none" | "cosine"
+    grad_clip: float | None = None  # None => disabled (paper default)
 
     # Steps between trace measurements (0 disables periodic collection).
     metric_interval_steps: int = 100
@@ -32,7 +37,12 @@ class TrainingConfig:
     seed: int = 42
     noise_rate: float = 0.0  # symmetric label-noise probability in [0, 1)
 
-    # Checkpoint epochs requested by the runner (resolved against epochs).
+    # Checkpoint epochs requested by the runner.  When ``None`` the
+    # runner falls back to the symbolic ``checkpoint_labels`` mapping
+    # (init / mid / final).  A concrete list overrides the labels and
+    # is the recommended path for reproducibility (the paper's plan
+    # uses ``[0, 10, 30]``).
+    checkpoint_epochs: list[int] | None = None
     checkpoint_labels: list[str] = field(
         default_factory=lambda: ["init", "mid", "final"]
     )

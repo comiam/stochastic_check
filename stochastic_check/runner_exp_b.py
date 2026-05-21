@@ -66,6 +66,7 @@ class ExpBRunner:
             weight_decay=cfg.training.weight_decay,
             epochs=cfg.training.epochs,
             scheduler=cfg.training.scheduler,
+            grad_clip=cfg.training.grad_clip,
             metric_interval_steps=cfg.training.metric_interval_steps,
             hessian_batch_size=cfg.estimator.hessian_batch_size,
             n_probes=cfg.estimator.n_probes,
@@ -81,11 +82,17 @@ class ExpBRunner:
         snapshot_dir = run_dir / "snapshots"
         jsonl_path = run_dir / "steps.jsonl"
 
-        # The 'init' / 'mid' / 'final' label mapping is symmetric across
-        # all runs: init = before epoch 1, mid = halfway, final = last.
-        cps = _resolve_checkpoint_epochs(
-            cfg.training.checkpoint_labels, cfg.training.epochs
-        )
+        # When ``training.checkpoint_epochs`` is provided it takes
+        # precedence over the symbolic labels (the recommended path);
+        # otherwise we fall back to the legacy mapping below.
+        if cfg.training.checkpoint_epochs is not None:
+            cps = _resolve_explicit_checkpoint_epochs(
+                cfg.training.checkpoint_epochs, cfg.training.epochs
+            )
+        else:
+            cps = _resolve_checkpoint_epochs(
+                cfg.training.checkpoint_labels, cfg.training.epochs
+            )
 
         t0 = time.perf_counter()
         train_summary = trainer.train(
@@ -128,3 +135,33 @@ def _resolve_checkpoint_epochs(
         else:
             mapping[label] = n_epochs
     return list(mapping.items())
+
+
+def _resolve_explicit_checkpoint_epochs(
+    epochs: list[int], n_epochs: int
+) -> list[tuple[str, int]]:
+    """Map an explicit list of epoch indices to ``(label, epoch)`` pairs.
+
+    Labels follow the convention used by experiment A: the smallest
+    epoch becomes ``init``, the largest becomes ``final``, every
+    intermediate epoch becomes ``epXX``.  All values must lie in the
+    closed range ``[0, n_epochs]``; duplicates are silently collapsed.
+    """
+    cleaned = sorted({int(e) for e in epochs})
+    for e in cleaned:
+        if not 0 <= e <= n_epochs:
+            raise ValueError(
+                f"checkpoint epoch {e} outside [0, {n_epochs}]"
+            )
+    if not cleaned:
+        return []
+    pairs: list[tuple[str, int]] = []
+    for idx, e in enumerate(cleaned):
+        if idx == 0:
+            label = "init"
+        elif idx == len(cleaned) - 1:
+            label = "final"
+        else:
+            label = f"ep{e:02d}"
+        pairs.append((label, e))
+    return pairs

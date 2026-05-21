@@ -1,21 +1,28 @@
 """Experiment A: post-hoc estimator comparison on saved checkpoints.
 
 For a given ``(arch, dataset, noise, seed)`` cell already trained by
-:mod:`runner_exp_b`, this runner loads every snapshot (init / mid /
-final), reconstructs the validation loader, samples a deterministic
-Hessian batch, and evaluates **all five estimators**:
+:mod:`runner_exp_b`, this runner loads every snapshot, reconstructs
+the validation loader, samples a deterministic Hessian batch, and
+evaluates the estimators reported in section 6 of the paper:
 
-  1. Hutchinson  (K = 10)
-  2. Hutchinson  (K = 50)
+  1. Hutchinson  (K = 5)
+  2. Hutchinson  (K = 10)
   3. Hutch++     (K_total = 10)
-  4. Becker-LeCun diagonal  (K_diag = 200)
-  5. K-FAC  (single update)
+  4. K-FAC       (single update; optional, falls back to a NaN
+                  payload when the ASDL backend is unavailable)
+
+The Becker-LeCun stochastic diagonal is omitted from the table
+because its layer trace is, by construction, the algebraic identity
+:math:`\\sum_i z_i (Hz)_i = z^\\top H z`, i.e. it coincides with
+Hutchinson at the same probe budget.  This is stated in section 6
+of the paper and the dedicated estimator class is kept in
+:mod:`hessian.trace` for tests and external use.
 
 For each estimator we record per-layer trace, total trace, and
-wallclock (CUDA-event timed when possible).  The cell against which
-relative error is computed is selected as Hutchinson K=200 (the
-de-facto "exact" surrogate used in the literature for moderately
-sized layers).
+wallclock.  The cell against which relative error is computed is
+Hutchinson with ``K_ref = 200`` (the de-facto exact surrogate at
+this scale; cf. section 5.3 of the paper).  The reference is
+computed once per snapshot and is not re-seeded inside the loop.
 
 The result is written to ``{output_dir}/{slug}/comparison.json``.
 """
@@ -25,6 +32,7 @@ from __future__ import annotations
 import logging
 import math
 import time
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
@@ -33,7 +41,6 @@ import torch
 import torch.nn as nn
 
 from hessian import (
-    BeckerLeCunDiagonalEstimator,
     HutchinsonTraceEstimator,
     HutchPlusPlusTraceEstimator,
     KFACTraceEstimator,
@@ -66,13 +73,21 @@ class CompareSpec:
     hessian_batch_size: int = 256
     reference_probes: int = 200  # Hutchinson-K=200 surrogate for "ground truth"
 
-    def estimators(self) -> dict[str, TraceEstimator]:
+    def estimator_factories(self) -> dict[str, Callable[[], TraceEstimator]]:
+        """Lazy estimator factories.
+
+        Construction is deferred to the comparison loop so that an
+        unavailable backend (e.g. ASDL for K-FAC) raises only inside
+        the per-estimator try/except and never aborts the whole
+        snapshot.
+        """
         return {
-            "hutchinson_k10": HutchinsonTraceEstimator(n_probes=10),
-            "hutchinson_k50": HutchinsonTraceEstimator(n_probes=50),
-            "hutch_plus_plus_k10": HutchPlusPlusTraceEstimator(n_total=10),
-            "bl_diag_k200": BeckerLeCunDiagonalEstimator(n_probes=200),
-            "kfac": KFACTraceEstimator(),
+            "hutchinson_k5": lambda: HutchinsonTraceEstimator(n_probes=5),
+            "hutchinson_k10": lambda: HutchinsonTraceEstimator(n_probes=10),
+            "hutch_plus_plus_k10": lambda: HutchPlusPlusTraceEstimator(
+                n_total=10
+            ),
+            "kfac": KFACTraceEstimator,
         }
 
 
@@ -165,15 +180,23 @@ class ExpARunner:
         ref_wallclock = time.perf_counter() - ref_t0
 
         per_estimator: dict[str, Any] = {}
-        for name, estimator in self.spec.estimators().items():
+        seed_base = int(self.spec.cfg.training.seed)
+        for name, factory in self.spec.estimator_factories().items():
+            # Re-seed the global RNG before each estimator so that the
+            # probe sequences of distinct estimators are independent of
+            # the order of the loop and of the reference's probe count.
+            # The seed mixes the run seed with the estimator name to
+            # keep estimators decorrelated while staying reproducible.
+            torch.manual_seed(_estimator_seed(seed_base, name))
             model = build_model(arch, num_classes).to(self.device)
             load_checkpoint(model, snap_path)
             layers = collect_layers(model)
             t0 = time.perf_counter()
             try:
+                estimator = factory()
                 traces = estimator.estimate(model, layers, x, y, loss_fn)
             except RuntimeError as exc:
-                logger.warning("Estimator %s failed: %s", name, exc)
+                logger.warning("Estimator %s unavailable: %s", name, exc)
                 traces = {layer.name: math.nan for layer in layers}
             wallclock = time.perf_counter() - t0
             per_estimator[name] = {
@@ -197,6 +220,21 @@ class ExpARunner:
 # ---------------------------------------------------------------------------
 #  Helpers
 # ---------------------------------------------------------------------------
+
+
+def _estimator_seed(base: int, name: str) -> int:
+    """Deterministic per-estimator seed in the 32-bit unsigned range.
+
+    A salted Python ``hash`` would be non-reproducible across
+    interpreter launches; we mix ``base`` with the SHA1 digest of the
+    estimator name instead so that the same ``(seed, name)`` always
+    produces the same probes.
+    """
+    import hashlib
+
+    digest = hashlib.sha1(name.encode("utf-8")).digest()
+    salt = int.from_bytes(digest[:4], "big")
+    return (base + salt) & 0x7FFFFFFF
 
 
 def _finite_sum(values: Any) -> float:

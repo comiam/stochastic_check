@@ -20,10 +20,9 @@ from ..formatting import fmt_mean_std
 from ..loader import iter_run_comparisons
 
 _ESTIMATORS = [
+    "hutchinson_k5",
     "hutchinson_k10",
-    "hutchinson_k50",
     "hutch_plus_plus_k10",
-    "bl_diag_k200",
     "kfac",
 ]
 

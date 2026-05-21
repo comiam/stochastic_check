@@ -3,13 +3,15 @@
 Compares the trace trajectory of layer ``ell`` between the clean
 baseline (``noise=0``) and a noisy condition (``noise=eta``) over the
 training epochs.  For each (arch, dataset, layer, epoch, eta) cell the
-effect size is
+effect size is, following equation (eq:cohens-d) of the paper,
 
-    d  =  ( mean(T_noisy) - mean(T_clean) ) / s_pooled,
+    d  =  ( mean(T_clean) - mean(T_noisy) ) / s_pooled,
 
 with ``s_pooled`` the pooled within-condition standard deviation
-across seeds.  Confidence intervals are obtained by 10 000-resample
-bootstrap (paired by seed where possible).
+across seeds.  The sign convention matches the paper: a positive
+``d`` means the clean regime exhibits the larger trace, which is the
+direction predicted for the head layer under symmetric label noise.
+Confidence intervals are obtained by 10 000-resample bootstrap.
 """
 
 from __future__ import annotations
@@ -46,7 +48,7 @@ def cohens_d(clean: Sequence[float], noisy: Sequence[float]) -> float:
     s = math.sqrt(max(s2, 1e-30))
     if s == 0.0:
         return 0.0
-    return float((b.mean() - a.mean()) / s)
+    return float((a.mean() - b.mean()) / s)
 
 
 def bootstrap_cohens_d(

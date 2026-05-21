@@ -407,14 +407,27 @@ class KFACTraceEstimator(TraceEstimator):
 
         modules: dict[str, Any] = dict(model.named_modules())
         traces: dict[str, float] = {}
+        unsupported: list[str] = []
         for layer in layers:
             mod = modules.get(layer.name)
             block = getattr(mod, "fisher", None) if mod is not None else None
             kron = getattr(block, "kron", None)
             if kron is None:
                 traces[layer.name] = math.nan
+                unsupported.append(layer.name)
                 continue
             tr_A = torch.trace(kron.A).item()
             tr_G = torch.trace(kron.G).item()
             traces[layer.name] = float(tr_A * tr_G)
+        if unsupported:
+            # K-FAC routinely skips BatchNorm and unsupported leaves.
+            # Surfacing the names once per call keeps the comparison
+            # table interpretable without flooding the log.
+            logger.warning(
+                "K-FAC: %d/%d layers without Kronecker factor (e.g. BN); "
+                "first few: %s",
+                len(unsupported),
+                len(layers),
+                unsupported[:5],
+            )
         return traces

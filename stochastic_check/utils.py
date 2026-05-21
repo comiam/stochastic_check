@@ -48,21 +48,37 @@ def set_seed(seed: int = 42) -> None:
 
 
 class JSONLWriter:
-    """Append-only JSON-lines writer for per-step measurement checkpoints.
+    """JSON-lines writer for per-step measurement checkpoints.
 
     The file is opened lazily so that empty runs do not create empty
     artefacts; each call to :meth:`write` flushes the record to disk so
     that a killed worker still leaves a consistent prefix of records on
-    disk -- this is what enables resume.
+    disk.
+
+    Parameters
+    ----------
+    path
+        Destination file.
+    mode
+        ``"w"`` (default) truncates any pre-existing file so that a
+        re-run of the same cell produces a clean trace stream;
+        ``"a"`` appends, which is intended only for explicit resume
+        workflows where the caller has verified the prefix.  The
+        downstream aggregator reads every record and averages over
+        an epoch window, so silently appending to an old stream from
+        a previous run would mix two distinct training trajectories.
     """
 
-    def __init__(self, path: Path) -> None:
+    def __init__(self, path: Path, mode: str = "w") -> None:
+        if mode not in {"w", "a"}:
+            raise ValueError(f"JSONLWriter: unsupported mode {mode!r}")
         self._path = path
+        self._mode = mode
         self._fh: Any = None
 
     def __enter__(self) -> JSONLWriter:
         self._path.parent.mkdir(parents=True, exist_ok=True)
-        self._fh = open(self._path, "a", buffering=1, encoding="utf-8")
+        self._fh = open(self._path, self._mode, buffering=1, encoding="utf-8")
         return self
 
     def __exit__(self, *_exc: object) -> None:
