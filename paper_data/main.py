@@ -12,6 +12,7 @@ from collections.abc import Callable
 from pathlib import Path
 
 from .config import DataPaths
+from .tables import decision_alerts as table_alerts
 from .tables import exp_a as table_exp_a
 from .tables import exp_b as table_exp_b
 
@@ -24,6 +25,7 @@ Generator = Callable[[DataPaths, Path], Path]
 REGISTRY: dict[str, Generator] = {
     "tab:comparison": table_exp_a.generate,
     "tab:cohens-d": table_exp_b.generate,
+    "tab:alerts": table_alerts.generate,
 }
 
 

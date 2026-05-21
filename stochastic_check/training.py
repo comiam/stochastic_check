@@ -71,6 +71,7 @@ class Trainer:
         metric_interval_steps: int = 100,
         hessian_batch_size: int = 128,
         n_probes: int = 10,
+        probe_seed: int | None = None,
         device: torch.device | None = None,
     ) -> None:
         self.device = device or torch.device(
@@ -105,6 +106,18 @@ class Trainer:
         self.loss_fn = nn.CrossEntropyLoss()
         self.layers: list[LayerSpec] = collect_layers(self.model)
         self.estimator = HutchinsonTraceEstimator(n_probes=n_probes)
+
+        # Dedicated probe RNG: isolates per-step trace stochasticity from
+        # the global torch RNG (which is consumed by data loaders and
+        # model dropout) so the trace stream is bit-reproducible given
+        # ``probe_seed`` even if the training data order is identical.
+        if probe_seed is not None:
+            self._probe_rng: torch.Generator | None = torch.Generator(
+                device=self.device
+            ).manual_seed(int(probe_seed))
+            self.estimator.set_generator(self._probe_rng)
+        else:
+            self._probe_rng = None
 
         self._global_step = 0
 

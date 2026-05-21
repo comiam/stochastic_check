@@ -22,9 +22,17 @@ from ..loader import iter_run_comparisons
 _ESTIMATORS = [
     "hutchinson_k5",
     "hutchinson_k10",
-    "hutch_plus_plus_k10",
+    "hutch_plus_plus_hvp13",
     "kfac",
 ]
+
+# LaTeX-friendly display names; keep the cost surface explicit.
+_DISPLAY_NAMES = {
+    "hutchinson_k5": r"Hutchinson ($K=5$, $5$ HVP)",
+    "hutchinson_k10": r"Hutchinson ($K=10$, $10$ HVP)",
+    "hutch_plus_plus_hvp13": r"Hutch++ ($n_{\mathrm{total}}=10$, $13$ HVP)",
+    "kfac": r"K-FAC (Fisher, $1$ pass)",
+}
 
 
 def generate(paths: DataPaths, out_dir: Path) -> Path:
@@ -63,7 +71,7 @@ def generate(paths: DataPaths, out_dir: Path) -> Path:
         lines.append(
             " & ".join(
                 [
-                    name.replace("_", r"\_"),
+                    _DISPLAY_NAMES.get(name, name.replace("_", r"\_")),
                     fmt_mean_std(rel_errors[name], digits=4),
                     fmt_mean_std(wallclocks[name], digits=3),
                     fmt_mean_std(norm_wallclocks[name], digits=2),

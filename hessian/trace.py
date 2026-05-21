@@ -24,6 +24,7 @@ from __future__ import annotations
 
 import logging
 import math
+import warnings
 from abc import ABC, abstractmethod
 from collections.abc import Callable, Iterable
 from dataclasses import dataclass
@@ -34,6 +35,41 @@ import torch.nn as nn
 from torch import Tensor
 
 logger = logging.getLogger(__name__)
+
+# Module-level latch: warn at most once about silently zero-filled gradients.
+# Such zero-fills are scientifically silent (they mask a missing autograd
+# path) but happen legitimately for unused tensors (e.g. an unused bias);
+# we surface the first occurrence and stay quiet thereafter.
+_WARNED_UNUSED_GRAD: bool = False
+_WARNED_UNUSED_HVP: bool = False
+
+
+def _warn_unused_grad_once(missing: int, total: int) -> None:
+    global _WARNED_UNUSED_GRAD
+    if _WARNED_UNUSED_GRAD:
+        return
+    _WARNED_UNUSED_GRAD = True
+    warnings.warn(
+        f"_stable_grad: {missing}/{total} parameters had no gradient flow "
+        "and were zero-filled; verify this is intentional (unused bias, "
+        "frozen branch) and not a bug in the forward pass.",
+        RuntimeWarning,
+        stacklevel=3,
+    )
+
+
+def _warn_unused_hvp_once(missing: int, total: int) -> None:
+    global _WARNED_UNUSED_HVP
+    if _WARNED_UNUSED_HVP:
+        return
+    _WARNED_UNUSED_HVP = True
+    warnings.warn(
+        f"_hvp: {missing}/{total} parameters had no second-order graph and "
+        "were zero-filled; this usually means a non-smooth op (e.g. ReLU "
+        "on a degenerate batch) and biases the per-layer trace downward.",
+        RuntimeWarning,
+        stacklevel=3,
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -97,6 +133,9 @@ def _stable_grad(loss: Tensor, params: list[nn.Parameter]) -> list[Tensor]:
         retain_graph=True,
         allow_unused=True,
     )
+    missing = sum(1 for g in grads if g is None)
+    if missing:
+        _warn_unused_grad_once(missing, len(params))
     return [
         g if g is not None else torch.zeros_like(p)
         for p, g in zip(params, grads, strict=True)
@@ -111,21 +150,57 @@ def _hvp(
     """One Hessian-vector product  Hv = d/dtheta (grad . vec)."""
     dot = sum((g * v).sum() for g, v in zip(grad_outputs, vec, strict=True))
     hv = torch.autograd.grad(dot, params, retain_graph=True, allow_unused=True)
+    missing = sum(1 for h in hv if h is None)
+    if missing:
+        _warn_unused_hvp_once(missing, len(params))
     return [
         h if h is not None else torch.zeros_like(p)
         for p, h in zip(params, hv, strict=True)
     ]
 
 
-def _sample_rademacher_like(params: Iterable[nn.Parameter]) -> list[Tensor]:
-    return [
-        torch.randint(0, 2, p.shape, device=p.device, dtype=p.dtype) * 2 - 1
-        for p in params
-    ]
+def _sample_rademacher_like(
+    params: Iterable[nn.Parameter],
+    generator: torch.Generator | None = None,
+) -> list[Tensor]:
+    """Per-parameter Rademacher draws.
+
+    A ``torch.Generator`` may be supplied to obtain a stream independent
+    of the global RNG; this is essential for reproducibility of probes
+    inside a training loop that also seeds the global RNG.
+    """
+    out: list[Tensor] = []
+    for p in params:
+        if generator is not None and generator.device != p.device:
+            # torch.randint requires the generator to live on the same
+            # device as the output; sample on the generator device and
+            # move, which keeps a single deterministic stream.
+            raw = torch.randint(
+                0, 2, p.shape, device=generator.device, generator=generator
+            ).to(device=p.device, dtype=p.dtype)
+        else:
+            raw = torch.randint(
+                0, 2, p.shape, device=p.device, dtype=p.dtype, generator=generator
+            )
+        out.append(raw * 2 - 1)
+    return out
 
 
-def _sample_gaussian_like(params: Iterable[nn.Parameter]) -> list[Tensor]:
-    return [torch.randn_like(p) for p in params]
+def _sample_gaussian_like(
+    params: Iterable[nn.Parameter],
+    generator: torch.Generator | None = None,
+) -> list[Tensor]:
+    out: list[Tensor] = []
+    for p in params:
+        if generator is not None and generator.device != p.device:
+            raw = torch.randn(p.shape, device=generator.device, generator=generator).to(
+                device=p.device, dtype=p.dtype
+            )
+        else:
+            raw = torch.empty_like(p)
+            raw.normal_(generator=generator)
+        out.append(raw)
+    return out
 
 
 def _flatten(tensors: list[Tensor]) -> Tensor:
@@ -173,9 +248,21 @@ def _flat_params(layers: list[LayerSpec]) -> list[nn.Parameter]:
 
 
 class TraceEstimator(ABC):
-    """Common protocol for layer-wise trace estimators."""
+    """Common protocol for layer-wise trace estimators.
+
+    Concrete estimators may carry a dedicated ``torch.Generator`` for
+    probe sampling; this isolates Hessian-trace randomness from the
+    global RNG (data loaders, dropout) and gives bit-reproducible
+    estimates given a fixed estimator seed.  The default implementation
+    is a no-op so K-FAC and other generator-agnostic estimators are
+    transparent.
+    """
 
     name: str = "<abstract>"
+
+    def set_generator(self, generator: torch.Generator | None) -> None:
+        """Install a dedicated probe-RNG; default: no-op."""
+        return
 
     @abstractmethod
     def estimate(
@@ -208,6 +295,10 @@ class HutchinsonTraceEstimator(TraceEstimator):
         if n_probes < 1:
             raise ValueError("n_probes must be >= 1")
         self._n_probes = n_probes
+        self._generator: torch.Generator | None = None
+
+    def set_generator(self, generator: torch.Generator | None) -> None:
+        self._generator = generator
 
     def estimate(
         self,
@@ -226,7 +317,7 @@ class HutchinsonTraceEstimator(TraceEstimator):
 
         acc: dict[str, float] = {layer.name: 0.0 for layer in layers}
         for _ in range(self._n_probes):
-            z = _sample_rademacher_like(params)
+            z = _sample_rademacher_like(params, generator=self._generator)
             hz = _hvp(grads, params, z)
             for k, v in _layer_quadratic(layers, z, hz).items():
                 acc[k] += v
@@ -273,6 +364,15 @@ class HutchPlusPlusTraceEstimator(TraceEstimator):
         n_hutch = max(1, n_total - n_orth)
         self._n_orth = n_orth
         self._n_hutch = n_hutch
+        self._generator: torch.Generator | None = None
+
+    @property
+    def hvp_budget(self) -> int:
+        """Number of HVPs spent per call: ``2*n_orth + n_hutch``."""
+        return 2 * self._n_orth + self._n_hutch
+
+    def set_generator(self, generator: torch.Generator | None) -> None:
+        self._generator = generator
 
     def estimate(
         self,
@@ -292,7 +392,7 @@ class HutchPlusPlusTraceEstimator(TraceEstimator):
         # --- 1-2:  Y = H G ---------------------------------------------------
         Y_cols: list[Tensor] = []
         for _ in range(self._n_orth):
-            g_struct = _sample_gaussian_like(params)
+            g_struct = _sample_gaussian_like(params, generator=self._generator)
             hg_struct = _hvp(grads, params, g_struct)
             Y_cols.append(_flatten(hg_struct))
         Y = torch.stack(Y_cols, dim=1)  # P x n_orth
@@ -311,7 +411,7 @@ class HutchPlusPlusTraceEstimator(TraceEstimator):
         # --- 5-7:  Hutchinson on residual subspace --------------------------
         resid: dict[str, float] = {layer.name: 0.0 for layer in layers}
         for _ in range(self._n_hutch):
-            s_struct = _sample_rademacher_like(params)
+            s_struct = _sample_rademacher_like(params, generator=self._generator)
             s_flat = _flatten(s_struct)
             s_proj_flat = s_flat - Q @ (Q.T @ s_flat)
             s_proj_struct = _unflatten(s_proj_flat, params)
@@ -348,6 +448,9 @@ class BeckerLeCunDiagonalEstimator(TraceEstimator):
     def __init__(self, n_probes: int = 200) -> None:
         self._impl = HutchinsonTraceEstimator(n_probes=n_probes)
 
+    def set_generator(self, generator: torch.Generator | None) -> None:
+        self._impl.set_generator(generator)
+
     def estimate(
         self,
         model: nn.Module,
@@ -368,30 +471,44 @@ class KFACTraceEstimator(TraceEstimator):
     """K-FAC trace approximation of tr(F) (empirical Fisher) via ASDL.
 
     .. warning::
-       K-FAC approximates the Gauss-Newton / Fisher matrix F, not the
-       Hessian H.  At a minimum of cross-entropy they coincide, but during
-       training the gap ``H - F`` (the H_tensor term) is not captured.
-       Numbers from this estimator are comparable to T_ell only up to the
-       GN-gap and should be interpreted with that caveat in the paper.
+       K-FAC approximates the empirical Fisher ``F``, not the Hessian
+       ``H``.  At a minimum of the cross-entropy loss the two coincide,
+       but during training the gap ``H - F`` (the ``H_tensor`` term of
+       the Gauss-Newton decomposition) is not captured.  Numbers from
+       this estimator are comparable to ``T_ell`` only up to that gap
+       and are reported with that caveat in section 6 of the paper.
 
-    Implementation: for each Kronecker-factored layer block
-    ``F_ell ~= A_ell (x) G_ell`` the trace decomposes as
-    ``tr(F_ell) = tr(A_ell) * tr(G_ell)``.  Layers unsupported by ASDL
-    (BatchNorm, embeddings) get ``NaN``; runners filter them out.
+    Implementation: ASDL accumulates a Kronecker-factored Fisher block
+    ``F_ell = A_ell (x) B_ell`` for every supported layer (``nn.Linear``,
+    ``nn.Conv2d``).  The trace then decomposes as
+    ``tr(F_ell) = tr(A_ell) * tr(B_ell)``.  Layers unsupported by ASDL
+    (``BatchNorm``, ``Embedding``, ``LayerNorm``) carry no ``fisher``
+    attribute after the curvature pass and are reported as ``NaN``;
+    downstream aggregators (paper_data) filter them.
     """
 
     name = "kfac"
 
     def __init__(self) -> None:
         try:
-            from asdfghjkl import FISHER_EMP, KFAC  # type: ignore[import]
+            from asdl import (  # type: ignore[import]
+                FISHER_EMP,
+                LOSS_CROSS_ENTROPY,
+                SHAPE_KRON,
+                FisherConfig,
+                get_fisher_maker,
+            )
         except ImportError as exc:  # pragma: no cover - optional dep
             raise RuntimeError(
-                "K-FAC estimator requires the `asdfghjkl` package; "
-                "install with `uv add asdfghjkl`."
+                "K-FAC estimator requires the `asdl` package "
+                "(distributed on PyPI as `asdfghjkl`); install with "
+                "`uv add asdfghjkl`."
             ) from exc
-        self._KFAC = KFAC
+        self._FisherConfig = FisherConfig
+        self._get_fisher_maker = get_fisher_maker
         self._FISHER_EMP = FISHER_EMP
+        self._SHAPE_KRON = SHAPE_KRON
+        self._LOSS_CROSS_ENTROPY = LOSS_CROSS_ENTROPY
 
     def estimate(
         self,
@@ -399,11 +516,21 @@ class KFACTraceEstimator(TraceEstimator):
         layers: list[LayerSpec],
         x: Tensor,
         y: Tensor,
-        loss_fn: LossFn,  # noqa: ARG002 - ASDL uses its own loss internally
+        loss_fn: LossFn,  # noqa: ARG002 - ASDL drives its own loss closure
     ) -> dict[str, float]:
-        kfac = self._KFAC(model, fisher_type=self._FISHER_EMP)
-        kfac.update_curvature(inputs=x, targets=y)
-        kfac.average_curvature(n=1)
+        import torch.nn.functional as F  # local: only needed for K-FAC
+
+        cfg = self._FisherConfig(
+            fisher_type=self._FISHER_EMP,
+            fisher_shapes=[self._SHAPE_KRON],
+            loss_type=self._LOSS_CROSS_ENTROPY,
+            data_size=int(x.shape[0]),
+            fisher_attr="fisher",
+        )
+        maker = self._get_fisher_maker(model, cfg)
+        dummy_logits = maker.setup_model_call(model, x)
+        maker.setup_loss_call(F.cross_entropy, dummy_logits, y, reduction="sum")
+        maker.forward_and_backward()
 
         modules: dict[str, Any] = dict(model.named_modules())
         traces: dict[str, float] = {}
@@ -416,16 +543,19 @@ class KFACTraceEstimator(TraceEstimator):
                 traces[layer.name] = math.nan
                 unsupported.append(layer.name)
                 continue
-            tr_A = torch.trace(kron.A).item()
-            tr_G = torch.trace(kron.G).item()
-            traces[layer.name] = float(tr_A * tr_G)
+            # ASDL stores the input-side factor in `.A` and the
+            # output-grad-side factor in `.B`; the data-side scaling
+            # constant is absorbed at curvature-accumulation time, so
+            # the layer-block trace is simply tr(A) * tr(B).
+            tr_A = float(torch.trace(kron.A).item())
+            tr_B = float(torch.trace(kron.B).item())
+            traces[layer.name] = tr_A * tr_B
         if unsupported:
-            # K-FAC routinely skips BatchNorm and unsupported leaves.
-            # Surfacing the names once per call keeps the comparison
-            # table interpretable without flooding the log.
+            # K-FAC routinely skips BatchNorm and other unsupported
+            # leaves.  Surfacing the names once per call keeps the
+            # comparison table interpretable without flooding the log.
             logger.warning(
-                "K-FAC: %d/%d layers without Kronecker factor (e.g. BN); "
-                "first few: %s",
+                "K-FAC: %d/%d layers without Kronecker factor (e.g. BN); first few: %s",
                 len(unsupported),
                 len(layers),
                 unsupported[:5],

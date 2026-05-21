@@ -70,6 +70,10 @@ class ExpBRunner:
             metric_interval_steps=cfg.training.metric_interval_steps,
             hessian_batch_size=cfg.estimator.hessian_batch_size,
             n_probes=cfg.estimator.n_probes,
+            # Derive a probe seed independent of training.seed so the
+            # trace-RNG stream is reproducible per-run and disjoint from
+            # the data-loading / dropout RNG.
+            probe_seed=cfg.training.seed * 1_000_003 + 17,
             device=device,
         )
 
@@ -150,9 +154,7 @@ def _resolve_explicit_checkpoint_epochs(
     cleaned = sorted({int(e) for e in epochs})
     for e in cleaned:
         if not 0 <= e <= n_epochs:
-            raise ValueError(
-                f"checkpoint epoch {e} outside [0, {n_epochs}]"
-            )
+            raise ValueError(f"checkpoint epoch {e} outside [0, {n_epochs}]")
     if not cleaned:
         return []
     pairs: list[tuple[str, int]] = []

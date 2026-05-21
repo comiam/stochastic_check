@@ -84,9 +84,11 @@ class CompareSpec:
         return {
             "hutchinson_k5": lambda: HutchinsonTraceEstimator(n_probes=5),
             "hutchinson_k10": lambda: HutchinsonTraceEstimator(n_probes=10),
-            "hutch_plus_plus_k10": lambda: HutchPlusPlusTraceEstimator(
-                n_total=10
-            ),
+            # Hutch++(n_total=10, n_orth_frac=1/3) spends 2*3 + 7 = 13 HVPs
+            # per call (Meyer 2021, eq. 4).  The key is named after the
+            # actual HVP budget rather than ``n_total`` to keep the
+            # paper table honest about cost.
+            "hutch_plus_plus_hvp13": lambda: HutchPlusPlusTraceEstimator(n_total=10),
             "kfac": KFACTraceEstimator,
         }
 
