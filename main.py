@@ -241,9 +241,7 @@ def _add_compare_subparser(sub: argparse._SubParsersAction) -> None:
 
 
 def _cmd_compare(args: argparse.Namespace) -> int:
-    slug = run_slug(
-        arch=args.arch, dataset=args.dataset, noise=args.noise, seed=args.seed
-    )
+    slug = run_slug(arch=args.arch, dataset=args.dataset, noise=args.noise, seed=args.seed)
     snapshot_dir = args.runs_root / slug / "snapshots"
     if not snapshot_dir.exists():
         logger.error("Snapshot directory not found: %s", snapshot_dir)
@@ -463,11 +461,12 @@ def _cmd_sweep(args: argparse.Namespace) -> int:
     for arch, dataset, noise, seed in cells:
         name = run_slug(arch=arch, dataset=dataset, noise=noise, seed=seed)
         weight = _ARCH_HOURS.get(arch, 1.0)
+        train_name = f"train:{name}"
         if schedule_train:
             tasks.append(
                 Task(
                     weight=weight,
-                    name=f"train:{name}",
+                    name=train_name,
                     seed=seed,
                     cmd=_train_cmd(arch, dataset, noise, seed),
                 )
@@ -479,6 +478,10 @@ def _cmd_sweep(args: argparse.Namespace) -> int:
                     name=f"compare:{name}",
                     seed=seed,
                     cmd=_compare_cmd(arch, dataset, noise, seed),
+                    # When training and comparison are scheduled together,
+                    # the comparison reads snapshots written by training and
+                    # must wait for it to finish.
+                    depends_on=[train_name] if schedule_train else [],
                 )
             )
 
@@ -540,11 +543,7 @@ def _add_aggregate_subparser(sub: argparse._SubParsersAction) -> None:
 
 
 def _cmd_aggregate(args: argparse.Namespace) -> int:
-    agg = (
-        aggregate_runs(args.root)
-        if args.kind == "exp_b"
-        else aggregate_comparisons(args.root)
-    )
+    agg = aggregate_runs(args.root) if args.kind == "exp_b" else aggregate_comparisons(args.root)
     dump_json(agg, args.out)
     logger.info("Wrote %s (%d runs)", args.out, agg["n_runs"])
     return 0
@@ -556,9 +555,7 @@ def _cmd_aggregate(args: argparse.Namespace) -> int:
 
 
 def main(argv: list[str] | None = None) -> int:
-    logging.basicConfig(
-        level=logging.INFO, format="%(levelname)s %(name)s: %(message)s"
-    )
+    logging.basicConfig(level=logging.INFO, format="%(levelname)s %(name)s: %(message)s")
     parser = argparse.ArgumentParser(
         prog="stochastic-check",
         description=__doc__,

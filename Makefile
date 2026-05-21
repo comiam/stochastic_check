@@ -31,20 +31,32 @@ test: ## Run pytest
 check: lint typecheck test ## Run lint + typecheck + test
 
 # ---------------------------------------------------------------------------
-# Experiments  (GPU=N to select a single GPU; otherwise full multi-GPU sweep)
+# Experiments
+#
+# Customise via environment variables (forwarded to run_all.sh):
+#   GPUS="0,1,2,3"   subset of GPU ids (default: all visible)
+#   WORKERS=2        concurrent tasks per GPU (default: 1)
+#   SEEDS="0 1 2"    subset of the seed axis (default: 0..9)
+#
+# Examples:
+#   make full   GPUS=0,1,2,3 WORKERS=2
+#   make exp_b  GPUS=2,3     WORKERS=2
+#   make exp_a  GPUS=0,1,2,3 WORKERS=2 SEEDS="0 1 2"
 # ---------------------------------------------------------------------------
 
+RUN := GPUS="$(GPUS)" WORKERS="$(WORKERS)" SEEDS="$(SEEDS)" bash run_all.sh
+
 diagnostic: ## Smoke run: 1 seed, 1 arch, 1 noise level, short training
-	bash run_all.sh diagnostic_run $(if $(GPU),--gpu $(GPU))
+	$(RUN) diagnostic_run
 
 full: ## Full Springer sweep (3 archs x 2 datasets x 4 noise x 10 seeds)
-	bash run_all.sh full_run
+	$(RUN) full_run
 
 exp_a: ## Only estimator comparison (post-hoc on existing checkpoints)
-	bash run_all.sh exp_a $(if $(GPU),--gpu $(GPU))
+	$(RUN) exp_a
 
 exp_b: ## Only training sweep (no estimator comparison)
-	bash run_all.sh exp_b
+	$(RUN) exp_b
 
 tables: ## Generate LaTeX tables from results/
 	uv run python -m paper_data.main

@@ -17,7 +17,6 @@ import multiprocessing as mp
 import os
 import queue
 import time
-from collections import deque
 
 from lab_orchestrator.progress import (
     ProgressFormatter,
@@ -38,22 +37,31 @@ _POLL_INTERVAL = 5.0  # seconds between worker liveness checks
 
 
 def _dispatch_pending(
-    task_pool: deque[Task],
+    task_pool: list[Task],
     pending_ready: dict[int, int],
     gpu_active_weight: dict[int, float],
     gpu_queues: dict[int, mp.Queue],  # type: ignore[type-arg]
+    done_names: set[str],
 ) -> int:
     """Send queued tasks to ready workers on the least-loaded GPU.
 
-    Returns the number of poison pills sent (when *task_pool* is exhausted).
+    Tasks with unsatisfied :attr:`Task.depends_on` are skipped over until
+    their dependencies appear in *done_names*.  Returns the number of
+    poison pills sent (when *task_pool* is exhausted).
     """
     pills = 0
     while task_pool:
         candidates = [g for g, n in pending_ready.items() if n > 0]
         if not candidates:
             break
+        idx = next(
+            (i for i, t in enumerate(task_pool) if all(d in done_names for d in t.depends_on)),
+            None,
+        )
+        if idx is None:
+            break  # only dep-blocked tasks remain; wait for in-flight to finish
+        task = task_pool.pop(idx)
         best = min(candidates, key=lambda g: (gpu_active_weight[g], g))
-        task = task_pool.popleft()
         gpu_queues[best].put(task)
         gpu_active_weight[best] += task.weight
         pending_ready[best] -= 1
@@ -85,33 +93,45 @@ def _dry_run(
     A heap-based timeline drives worker completion events so that
     ``--dry-run`` output matches the actual execution order.
     """
-    # Completion events: (finish_time, gpu_id, task_weight).
-    event_heap: list[tuple[float, int, float]] = []
+    # Completion events: (finish_time, gpu_id, task_weight, task_name).
+    event_heap: list[tuple[float, int, float, str]] = []
     pending_ready: dict[int, int] = {g: workers_per_gpu for g in gpu_ids}
     gpu_active_weight: dict[int, float] = {g: 0.0 for g in gpu_ids}
     gpu_assignments: dict[int, list[str]] = {g: [] for g in gpu_ids}
+    pending: list[Task] = list(tasks)
+    done_names: set[str] = set()
     sim_time = 0.0
 
-    for task in tasks:
-        # Advance time until at least one worker is ready.
-        while not any(n > 0 for n in pending_ready.values()):
-            finish_time, g, w = heapq.heappop(event_heap)
+    while pending:
+        # Find next dispatchable task: deps satisfied and a worker free.
+        ready_idx = next(
+            (i for i, t in enumerate(pending) if all(d in done_names for d in t.depends_on)),
+            None,
+        )
+        if ready_idx is None or not any(n > 0 for n in pending_ready.values()):
+            if not event_heap:
+                logger.error("dry-run: deadlock detected (unsatisfiable dependencies)")
+                break
+            finish_time, g, w, fname = heapq.heappop(event_heap)
             sim_time = finish_time
             gpu_active_weight[g] -= w
             pending_ready[g] += 1
+            done_names.add(fname)
+            continue
 
+        task = pending.pop(ready_idx)
         candidates = [g for g, n in pending_ready.items() if n > 0]
         best = min(candidates, key=lambda g: (gpu_active_weight[g], g))
 
         gpu_assignments[best].append(task.label)
         gpu_active_weight[best] += task.weight
         pending_ready[best] -= 1
-        heapq.heappush(event_heap, (sim_time + task.weight, best, task.weight))
+        heapq.heappush(event_heap, (sim_time + task.weight, best, task.weight, task.name))
 
     # Drain remaining events to find per-GPU peak finish times.
     gpu_peak: dict[int, float] = {g: 0.0 for g in gpu_ids}
     while event_heap:
-        finish_time, g, _w = heapq.heappop(event_heap)
+        finish_time, g, _w, _fname = heapq.heappop(event_heap)
         gpu_peak[g] = max(gpu_peak[g], finish_time)
 
     for g in gpu_ids:
@@ -219,10 +239,12 @@ def run_schedule(
     gpu_queues: dict[int, mp.Queue] = {g: mp.Queue() for g in gpu_ids}
 
     n_total_workers = len(gpu_ids) * workers_per_gpu
-    task_pool: deque[Task] = deque(tasks)
+    task_pool: list[Task] = list(tasks)
     pending_ready: dict[int, int] = {g: 0 for g in gpu_ids}
     gpu_active_weight: dict[int, float] = {g: 0.0 for g in gpu_ids}
     pills_sent = 0
+    done_names: set[str] = set()
+    failed_names: set[str] = set()
     # pid -> (gpu_id, label, weight) for in-flight task tracking.
     active_by_pid: dict[int, tuple[int, str, float]] = {}
     worker_gpu: dict[int, int] = {}  # mp.Process.pid -> gpu_id
@@ -278,6 +300,7 @@ def run_schedule(
                 done_count += 1
                 done_weight += weight
                 fail_count += 1
+                failed_names.add(label.rsplit("[seed=", 1)[0])
                 results.append((gpu_id, label, -9, 0.0))
                 logger.error(
                     "GPU %d  worker (pid %d) died while running %s",
@@ -297,9 +320,7 @@ def run_schedule(
                     idle = now - last_activity.get(g, wall_t0)
                     if idle >= stall_warning and g not in _warned_stall:
                         _warned_stall.add(g)
-                        labels = [
-                            info[1] for info in active_by_pid.values() if info[0] == g
-                        ]
+                        labels = [info[1] for info in active_by_pid.values() if info[0] == g]
                         logger.warning(
                             "GPU %d  no activity for %.0fs  (in-flight: %s)",
                             g,
@@ -336,7 +357,13 @@ def run_schedule(
             gpu_active_weight[gpu_id] -= weight
             done_count += 1
             done_weight += weight
-            if rc != 0:
+            # ``label`` is ``Task.label`` == "<name>[seed=<seed>]"; dependency
+            # ids are bare ``Task.name`` values, so strip the seed suffix.
+            task_name = label.rsplit("[seed=", 1)[0]
+            if rc == 0:
+                done_names.add(task_name)
+            else:
+                failed_names.add(task_name)
                 fail_count += 1
             results.append((gpu_id, label, rc, elapsed))
 
@@ -351,9 +378,7 @@ def run_schedule(
             )
 
             status = "OK" if rc == 0 else f"FAIL(rc={rc})"
-            logger.info(
-                "GPU %d  %s  %s  (%.1f min)", gpu_id, status, label, elapsed / 60
-            )
+            logger.info("GPU %d  %s  %s  (%.1f min)", gpu_id, status, label, elapsed / 60)
 
         # Stop dispatching new tasks when failure threshold is reached.
         if max_failures is not None and fail_count >= max_failures:
@@ -367,8 +392,34 @@ def run_schedule(
                     skipped,
                 )
 
+        # Cascade-skip tasks whose dependencies have failed.  Keep
+        # iterating: a skipped task's name goes into ``failed_names`` and
+        # may transitively block further tasks.
+        if failed_names:
+            changed = True
+            while changed:
+                changed = False
+                remaining: list[Task] = []
+                for t in task_pool:
+                    blocked_by = [d for d in t.depends_on if d in failed_names]
+                    if blocked_by:
+                        failed_names.add(t.name)
+                        fail_count += 1
+                        done_count += 1
+                        done_weight += t.weight
+                        results.append((-1, t.label, -2, 0.0))
+                        logger.error(
+                            "SKIP  %s  (dependency failed: %s)",
+                            t.label,
+                            ", ".join(blocked_by),
+                        )
+                        changed = True
+                    else:
+                        remaining.append(t)
+                task_pool = remaining
+
         pills_sent += _dispatch_pending(
-            task_pool, pending_ready, gpu_active_weight, gpu_queues
+            task_pool, pending_ready, gpu_active_weight, gpu_queues, done_names
         )
 
     # Retire workers that became ready after last task finished.

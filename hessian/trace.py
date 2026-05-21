@@ -136,10 +136,7 @@ def _stable_grad(loss: Tensor, params: list[nn.Parameter]) -> list[Tensor]:
     missing = sum(1 for g in grads if g is None)
     if missing:
         _warn_unused_grad_once(missing, len(params))
-    return [
-        g if g is not None else torch.zeros_like(p)
-        for p, g in zip(params, grads, strict=True)
-    ]
+    return [g if g is not None else torch.zeros_like(p) for p, g in zip(params, grads, strict=True)]
 
 
 def _hvp(
@@ -153,10 +150,7 @@ def _hvp(
     missing = sum(1 for h in hv if h is None)
     if missing:
         _warn_unused_hvp_once(missing, len(params))
-    return [
-        h if h is not None else torch.zeros_like(p)
-        for p, h in zip(params, hv, strict=True)
-    ]
+    return [h if h is not None else torch.zeros_like(p) for p, h in zip(params, hv, strict=True)]
 
 
 def _sample_rademacher_like(
@@ -175,13 +169,11 @@ def _sample_rademacher_like(
             # torch.randint requires the generator to live on the same
             # device as the output; sample on the generator device and
             # move, which keeps a single deterministic stream.
-            raw = torch.randint(
-                0, 2, p.shape, device=generator.device, generator=generator
-            ).to(device=p.device, dtype=p.dtype)
-        else:
-            raw = torch.randint(
-                0, 2, p.shape, device=p.device, dtype=p.dtype, generator=generator
+            raw = torch.randint(0, 2, p.shape, device=generator.device, generator=generator).to(
+                device=p.device, dtype=p.dtype
             )
+        else:
+            raw = torch.randint(0, 2, p.shape, device=p.device, dtype=p.dtype, generator=generator)
         out.append(raw * 2 - 1)
     return out
 
@@ -420,8 +412,7 @@ class HutchPlusPlusTraceEstimator(TraceEstimator):
                 resid[k] += v
 
         return {
-            layer.name: lowrank[layer.name] + resid[layer.name] / self._n_hutch
-            for layer in layers
+            layer.name: lowrank[layer.name] + resid[layer.name] / self._n_hutch for layer in layers
         }
 
 
@@ -499,10 +490,11 @@ class KFACTraceEstimator(TraceEstimator):
                 get_fisher_maker,
             )
         except ImportError as exc:  # pragma: no cover - optional dep
+            logger.error("K-FAC asdl import failed: %r", exc)
             raise RuntimeError(
-                "K-FAC estimator requires the `asdl` package "
-                "(distributed on PyPI as `asdfghjkl`); install with "
-                "`uv add asdfghjkl`."
+                f"K-FAC estimator requires the `asdl` package "
+                f"(distributed on PyPI as `asdfghjkl`); install with "
+                f"`uv add asdfghjkl`. Underlying import error: {exc!r}"
             ) from exc
         self._FisherConfig = FisherConfig
         self._get_fisher_maker = get_fisher_maker

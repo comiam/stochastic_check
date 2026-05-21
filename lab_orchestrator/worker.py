@@ -33,9 +33,30 @@ def gpu_worker(
 
     Each task is run as a subprocess with ``CUDA_VISIBLE_DEVICES`` set.
     Stdout/stderr are captured to a per-task log file in *log_dir*.
+
+    *gpu_id* is interpreted as an index into the parent's
+    ``CUDA_VISIBLE_DEVICES`` (the *logical* GPU id, matching what the
+    user passed via ``--gpu-ids``).  When the parent already filters
+    visible devices (e.g. ``CUDA_VISIBLE_DEVICES=1,2``), we translate
+    the logical index back to the corresponding physical device id so
+    the child sees exactly one device.  Without this mapping, the child
+    would re-interpret the integer as an absolute physical id and could
+    land on a different (possibly someone else's) GPU.
     """
+    parent_cvd = os.environ.get("CUDA_VISIBLE_DEVICES")
+    if parent_cvd is None or parent_cvd == "":
+        physical_id = gpu_id
+    else:
+        visible = [tok.strip() for tok in parent_cvd.split(",") if tok.strip()]
+        if 0 <= gpu_id < len(visible):
+            physical_id = visible[gpu_id]
+        else:
+            # Logical id outside parent's visible set: fall back to
+            # passing the id verbatim and let CUDA error out clearly.
+            physical_id = str(gpu_id)
+
     env = os.environ.copy()
-    env["CUDA_VISIBLE_DEVICES"] = str(gpu_id)
+    env["CUDA_VISIBLE_DEVICES"] = str(physical_id)
     env.setdefault("CUBLAS_WORKSPACE_CONFIG", ":4096:8")
 
     os.makedirs(log_dir, exist_ok=True)
@@ -65,14 +86,10 @@ def gpu_worker(
             rc = proc.returncode
         except subprocess.TimeoutExpired:
             rc = -1
-            logger.warning(
-                "GPU %d  TIMEOUT after %.0fs  %s", gpu_id, timeout, task.label
-            )
+            logger.warning("GPU %d  TIMEOUT after %.0fs  %s", gpu_id, timeout, task.label)
         except OSError as exc:
             rc = -2
             logger.error("GPU %d  OS error for %s: %s", gpu_id, task.label, exc)
         elapsed = time.monotonic() - t0
 
-        result_queue.put(
-            ("DONE", gpu_id, task.label, rc, elapsed, task.weight, os.getpid())
-        )
+        result_queue.put(("DONE", gpu_id, task.label, rc, elapsed, task.weight, os.getpid()))

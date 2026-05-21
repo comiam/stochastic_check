@@ -13,7 +13,7 @@ table:
   * ``alert rate``            (fraction of seeds that ever fired),
   * ``earliest layer``        (most common first-crossing layer).
 
-This is the artefact that backs the §7.2 claim that the on-line
+This is the artefact that backs the Sec.7.2 claim that the on-line
 detector triggers well before terminal validation accuracy collapses.
 Clean runs (``noise = 0``) are omitted from the rows but their alert
 rate is kept as a control row to advertise the false-positive count.

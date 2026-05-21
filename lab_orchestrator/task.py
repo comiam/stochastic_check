@@ -23,12 +23,17 @@ class Task:
         Full command to execute as a subprocess.  The scheduler sets
         ``CUDA_VISIBLE_DEVICES`` in the environment; the command itself
         should NOT include GPU selection flags.
+    depends_on : list[str]
+        Names of tasks that must complete successfully before this task
+        is dispatched.  If any dependency fails, the task is skipped
+        with rc=-2 and counted as a failure.
     """
 
     weight: float = field(compare=True)
     name: str = field(compare=True)
     seed: int = field(compare=True)
     cmd: list[str] = field(default_factory=list, compare=False)
+    depends_on: list[str] = field(default_factory=list, compare=False)
 
     @property
     def label(self) -> str:
@@ -71,9 +76,7 @@ def build_task_matrix(
     if available_names is not None:
         for n in names:
             if n not in available_names:
-                raise ValueError(
-                    f"Unknown name {n!r}. Available: {', '.join(available_names)}"
-                )
+                raise ValueError(f"Unknown name {n!r}. Available: {', '.join(available_names)}")
 
     seen: set[tuple[str, int]] = set()
     tasks: list[Task] = []
