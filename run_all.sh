@@ -98,10 +98,21 @@ if [[ ${#SEED_LIST[@]} -eq 0 ]]; then
     exit 2
 fi
 
+# ---- Dataset pre-download --------------------------------------------------
+#
+# Torchvision races on its marker file when ``download=True`` is called
+# concurrently from multiple workers; pre-fetching once in this process
+# avoids losing the occasional cell to a half-written archive.
+ensure_datasets() {
+    python -c \
+"from stochastic_check.data import ensure_datasets_downloaded; ensure_datasets_downloaded()"
+}
+
 # ---- Mode dispatch ---------------------------------------------------------
 
 run_diagnostic() {
     echo "[diagnostic] single-cell smoke test: ResNet-18 / CIFAR-10 / eta=0.40 / seed=0"
+    ensure_datasets
     python -m main train \
         --arch resnet18 \
         --dataset cifar10 \
@@ -129,6 +140,7 @@ run_diagnostic() {
 
 run_full_training() {
     echo "[full_run] dispatching full sweep (archs x datasets x noises x seeds=${SEED_LIST[*]})"
+    ensure_datasets
     python -m main sweep \
         --archs resnet18 vgg11 resnet34 \
         --datasets cifar10 cifar100 \
@@ -149,6 +161,7 @@ run_full_training() {
 
 run_exp_b_only() {
     echo "[exp_b] training stage only (seeds=${SEED_LIST[*]})"
+    ensure_datasets
     python -m main sweep \
         --archs resnet18 vgg11 resnet34 \
         --datasets cifar10 cifar100 \
@@ -167,6 +180,7 @@ run_exp_b_only() {
 
 run_exp_a_only() {
     echo "[exp_a] re-running estimator-comparison stage only (seeds=${SEED_LIST[*]})"
+    ensure_datasets
     python -m main sweep \
         --archs resnet18 vgg11 resnet34 \
         --datasets cifar10 cifar100 \

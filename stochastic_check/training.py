@@ -30,6 +30,7 @@ from torch.utils.data import DataLoader
 from hessian import (
     HutchinsonTraceEstimator,
     LayerSpec,
+    TraceEstimator,
     collect_layers,
 )
 
@@ -105,7 +106,7 @@ class Trainer:
 
         self.loss_fn = nn.CrossEntropyLoss()
         self.layers: list[LayerSpec] = collect_layers(self.model)
-        self.estimator = HutchinsonTraceEstimator(n_probes=n_probes)
+        self.estimator: TraceEstimator = HutchinsonTraceEstimator(n_probes=n_probes)
 
         # Dedicated probe RNG: isolates per-step trace stochasticity from
         # the global torch RNG (which is consumed by data loaders and
@@ -158,6 +159,14 @@ class Trainer:
     def measure_trace(self) -> dict[str, float]:
         """Compute the layer-wise trace on a fresh Hessian batch.
 
+        The HVP batch is drawn from ``train_loader`` so the measured
+        curvature reflects the *training* distribution -- including the
+        injected label noise and the standard augmentation pipeline --
+        which is the quantity the paper's theory (sections 4-7) speaks
+        about.  Sampling from ``val_loader`` instead would decouple the
+        trace from the noise regime (clean labels, no augmentation,
+        ``shuffle=False`` => the same 128 examples on every call).
+
         The model is left in ``eval()`` mode to disable dropout / BN
         stats updates and the previous training gradients are cleared
         afterwards so that the optimiser step is not polluted.
@@ -165,7 +174,7 @@ class Trainer:
         was_training = self.model.training
         self.model.eval()
         x, y = sample_hessian_batch(
-            self.val_loader, self.hessian_batch_size, self.device
+            self.train_loader, self.hessian_batch_size, self.device
         )
         traces = self.estimator.estimate(self.model, self.layers, x, y, self.loss_fn)
         self.model.zero_grad(set_to_none=True)

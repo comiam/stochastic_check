@@ -93,6 +93,21 @@ def _get_dataset_cls(dataset: str) -> type[torchvision.datasets.VisionDataset]:
     }[dataset]
 
 
+def ensure_datasets_downloaded(data_root: str = "./data") -> None:
+    """Single-process pre-download of every dataset used by the sweep.
+
+    Call this *once* before the parallel orchestrator dispatches worker
+    processes; concurrent ``download=True`` calls from multiple workers
+    race on torchvision's marker file and one of them ends up with a
+    half-written archive (``RuntimeError: Dataset not found or
+    corrupted``).  The download is a no-op when the archive is already
+    present, so the function is safe to call unconditionally.
+    """
+    for ds_cls in (torchvision.datasets.CIFAR10, torchvision.datasets.CIFAR100):
+        ds_cls(data_root, train=True, download=True)
+        ds_cls(data_root, train=False, download=True)
+
+
 def get_loaders(
     dataset: str,
     batch_size: int,
