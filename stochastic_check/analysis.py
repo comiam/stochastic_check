@@ -45,10 +45,13 @@ def cohens_d(clean: Sequence[float], noisy: Sequence[float]) -> float:
     s2 = ((a.size - 1) * a.var(ddof=1) + (b.size - 1) * b.var(ddof=1)) / (
         a.size + b.size - 2
     )
-    s = math.sqrt(max(s2, 1e-30))
-    if s == 0.0:
+    if s2 <= 0.0:
+        # Both groups are constant within their own seed.  Effect size
+        # is undefined in the strict sense; ``0`` matches the convention
+        # used elsewhere in the paper's table generators (a vanishing
+        # within-group variance carries no evidence of separation).
         return 0.0
-    return float((a.mean() - b.mean()) / s)
+    return float((a.mean() - b.mean()) / math.sqrt(s2))
 
 
 def bootstrap_cohens_d(

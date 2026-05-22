@@ -120,6 +120,27 @@ class Trainer:
         else:
             self._probe_rng = None
 
+        # Dedicated HVP-batch loader: shares the training *dataset*
+        # (noisy labels, augmented transforms) but has its own RNG, so
+        # consuming a Hessian batch does *not* mutate the sampler state
+        # of ``train_loader``.  Without this, every ``measure_trace``
+        # call would advance ``train_loader``'s shuffling generator and
+        # the order of training batches in subsequent epochs would
+        # silently depend on ``metric_interval_steps`` -- breaking
+        # bit-reproducibility w.r.t. that knob.
+        hvp_generator = torch.Generator().manual_seed(
+            int(probe_seed) + 1 if probe_seed is not None else 0
+        )
+        self._hvp_loader = DataLoader(
+            train_loader.dataset,
+            batch_size=hessian_batch_size,
+            shuffle=True,
+            num_workers=0,
+            pin_memory=train_loader.pin_memory,
+            drop_last=True,
+            generator=hvp_generator,
+        )
+
         self._global_step = 0
 
     # ------------------------------------------------------------------
@@ -159,13 +180,15 @@ class Trainer:
     def measure_trace(self) -> dict[str, float]:
         """Compute the layer-wise trace on a fresh Hessian batch.
 
-        The HVP batch is drawn from ``train_loader`` so the measured
-        curvature reflects the *training* distribution -- including the
-        injected label noise and the standard augmentation pipeline --
-        which is the quantity the paper's theory (sections 4-7) speaks
-        about.  Sampling from ``val_loader`` instead would decouple the
-        trace from the noise regime (clean labels, no augmentation,
-        ``shuffle=False`` => the same 128 examples on every call).
+        The HVP batch is drawn from a dedicated ``_hvp_loader`` that
+        shares the training *dataset* (noisy labels, augmented
+        transforms) but uses an independent RNG, so the measurement
+        reflects the training distribution -- which is the quantity the
+        paper's theory (sections 4-7) speaks about -- without mutating
+        the shuffling state of ``train_loader``.  Sampling from
+        ``val_loader`` would decouple the trace from the noise regime
+        (clean labels, no augmentation, ``shuffle=False`` => the same
+        128 examples on every call).
 
         The model is left in ``eval()`` mode to disable dropout / BN
         stats updates and the previous training gradients are cleared
@@ -174,7 +197,7 @@ class Trainer:
         was_training = self.model.training
         self.model.eval()
         x, y = sample_hessian_batch(
-            self.train_loader, self.hessian_batch_size, self.device
+            self._hvp_loader, self.hessian_batch_size, self.device
         )
         traces = self.estimator.estimate(self.model, self.layers, x, y, self.loss_fn)
         self.model.zero_grad(set_to_none=True)

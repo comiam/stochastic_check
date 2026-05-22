@@ -135,3 +135,77 @@ def test_measure_trace_restores_train_mode() -> None:
     trainer.model.eval()
     trainer.measure_trace()
     assert trainer.model.training is False
+
+
+def test_measure_trace_preserves_train_loader_shuffling() -> None:
+    """Regression: ``measure_trace`` must not consume ``train_loader``'s
+    shuffling RNG.
+
+    If the HVP batch were drawn directly from ``train_loader``, each
+    ``measure_trace`` call would advance the shared sampler generator
+    and the order of training batches in subsequent epochs would
+    silently depend on ``metric_interval_steps``.  We assert that the
+    sequence of training batches is identical with and without an
+    intervening trace measurement.
+    """
+    n, batch_size = 64, 8
+
+    def _shuffled_loader(seed: int) -> DataLoader:
+        # Distinct (x, y) per sample so the batch order is observable.
+        x = torch.arange(n, dtype=torch.float32).view(n, 1, 1, 1).expand(n, 3, 4, 4)
+        y = torch.arange(n) % 2
+        gen = torch.Generator().manual_seed(seed)
+        return DataLoader(
+            TensorDataset(x.clone(), y.clone()),
+            batch_size=batch_size,
+            shuffle=True,
+            generator=gen,
+        )
+
+    # Loader A: drained twice without any HVP measurement in between.
+    loader_a = _shuffled_loader(seed=123)
+    reference = [batch[0].clone() for batch in loader_a]
+
+    # Loader B: identically seeded; interleave a measure_trace() call
+    # between the two iterations.
+    loader_b = _shuffled_loader(seed=123)
+    val_loader = _sentinel_loader(value=0.0, label=1, n=16, batch_size=8)
+    trainer = _build_trainer(loader_b, val_loader)
+    trainer.estimator = _RecordingEstimator()
+
+    observed_first_pass = [batch[0].clone() for batch in loader_b]
+    trainer.measure_trace()  # must not perturb loader_b's RNG state
+    observed_second_pass = [batch[0].clone() for batch in loader_b]
+
+    # The first pass should match the reference's first epoch and the
+    # second pass should match the reference's second epoch.  We can
+    # only check the first pass directly against the reference (the
+    # second epoch's batches differ because the generator advanced
+    # during the first iter).  The strict assertion is: with vs without
+    # an intervening measure_trace, the second-pass sequences agree.
+    loader_c = _shuffled_loader(seed=123)
+    _ = [batch[0].clone() for batch in loader_c]  # drain once
+    second_pass_no_hvp = [batch[0].clone() for batch in loader_c]
+
+    assert all(
+        torch.equal(a, b) for a, b in zip(observed_first_pass, reference, strict=True)
+    )
+    assert all(
+        torch.equal(a, b)
+        for a, b in zip(observed_second_pass, second_pass_no_hvp, strict=True)
+    ), (
+        "measure_trace consumed train_loader's shuffling generator: "
+        "subsequent epoch ordering depends on metric_interval_steps."
+    )
+
+
+def test_trainer_owns_isolated_hvp_loader() -> None:
+    """The HVP loader is a distinct ``DataLoader`` instance sharing the
+    training *dataset* but not the sampler state -- a structural
+    invariant complementing the behavioural test above."""
+    train_loader = _sentinel_loader(value=1.0, label=0)
+    val_loader = _sentinel_loader(value=0.0, label=1)
+    trainer = _build_trainer(train_loader, val_loader)
+
+    assert trainer._hvp_loader is not train_loader
+    assert trainer._hvp_loader.dataset is train_loader.dataset
