@@ -75,9 +75,7 @@ class Trainer:
         probe_seed: int | None = None,
         device: torch.device | None = None,
     ) -> None:
-        self.device = device or torch.device(
-            "cuda" if torch.cuda.is_available() else "cpu"
-        )
+        self.device = device or torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.model = model.to(self.device)
         self.train_loader = train_loader
         self.val_loader = val_loader
@@ -196,9 +194,7 @@ class Trainer:
         """
         was_training = self.model.training
         self.model.eval()
-        x, y = sample_hessian_batch(
-            self._hvp_loader, self.hessian_batch_size, self.device
-        )
+        x, y = sample_hessian_batch(self._hvp_loader, self.hessian_batch_size, self.device)
         traces = self.estimator.estimate(self.model, self.layers, x, y, self.loss_fn)
         self.model.zero_grad(set_to_none=True)
         if was_training:
@@ -273,9 +269,7 @@ class Trainer:
 
                 for label, ep in cps.items():
                     if ep == epoch:
-                        snapshots[label] = self._record_checkpoint(
-                            label, ep, snapshot_dir
-                        )
+                        snapshots[label] = self._record_checkpoint(label, ep, snapshot_dir)
 
         return {
             "epochs": self.epochs,
@@ -288,9 +282,7 @@ class Trainer:
     #  Helpers
     # ------------------------------------------------------------------
 
-    def _record_checkpoint(
-        self, label: str, epoch: int, snapshot_dir: Path
-    ) -> dict[str, Any]:
+    def _record_checkpoint(self, label: str, epoch: int, snapshot_dir: Path) -> dict[str, Any]:
         state = self.snapshot()
         path = snapshot_dir / f"{label}.pt"
         self.save_snapshot(state, path)

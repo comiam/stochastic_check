@@ -107,12 +107,12 @@ def test_measure_trace_samples_from_train_loader() -> None:
 
     assert recorder.last_x is not None
     assert recorder.last_y is not None
-    assert torch.all(recorder.last_x == 1.0), (
-        "HVP inputs must come from train_loader (value=1), got val (value=0)."
-    )
-    assert torch.all(recorder.last_y == 0), (
-        "HVP labels must come from train_loader (label=0), got val (label=1)."
-    )
+    assert torch.all(
+        recorder.last_x == 1.0
+    ), "HVP inputs must come from train_loader (value=1), got val (value=0)."
+    assert torch.all(
+        recorder.last_y == 0
+    ), "HVP labels must come from train_loader (label=0), got val (label=1)."
 
 
 def test_measure_trace_restores_train_mode() -> None:
@@ -187,12 +187,9 @@ def test_measure_trace_preserves_train_loader_shuffling() -> None:
     _ = [batch[0].clone() for batch in loader_c]  # drain once
     second_pass_no_hvp = [batch[0].clone() for batch in loader_c]
 
+    assert all(torch.equal(a, b) for a, b in zip(observed_first_pass, reference, strict=True))
     assert all(
-        torch.equal(a, b) for a, b in zip(observed_first_pass, reference, strict=True)
-    )
-    assert all(
-        torch.equal(a, b)
-        for a, b in zip(observed_second_pass, second_pass_no_hvp, strict=True)
+        torch.equal(a, b) for a, b in zip(observed_second_pass, second_pass_no_hvp, strict=True)
     ), (
         "measure_trace consumed train_loader's shuffling generator: "
         "subsequent epoch ordering depends on metric_interval_steps."

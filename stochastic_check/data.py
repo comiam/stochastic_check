@@ -130,9 +130,7 @@ def get_loaders(
 
     num_classes = 10 if dataset == "cifar10" else 100
     clean_targets = np.asarray(train_ds.targets, dtype=np.int64).copy()
-    noisy_targets = corrupt_labels(
-        clean_targets, noise_rate, num_classes, seed=noise_seed
-    )
+    noisy_targets = corrupt_labels(clean_targets, noise_rate, num_classes, seed=noise_seed)
     train_ds.targets = noisy_targets.tolist()
     train_ds.clean_targets = clean_targets  # type: ignore[attr-defined]
 
