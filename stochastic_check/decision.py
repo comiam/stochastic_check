@@ -52,9 +52,7 @@ import numpy as np
 # ---------------------------------------------------------------------------
 #  Low-level helpers
 # ---------------------------------------------------------------------------
-def _layer_series(
-    records: Iterable[dict], layer: str
-) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+def _layer_series(records: Iterable[dict], layer: str) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     """Extract aligned ``(steps, epochs, traces)`` arrays for one layer.
 
     Non-finite trace values are dropped.  The arrays are ordered by the
@@ -104,9 +102,7 @@ class EnsembleBaseline:
     n: int
 
     @classmethod
-    def from_runs(
-        cls, calibration_runs: Sequence[Iterable[dict]], layer: str
-    ) -> EnsembleBaseline:
+    def from_runs(cls, calibration_runs: Sequence[Iterable[dict]], layer: str) -> EnsembleBaseline:
         """Build the baseline from ``S`` calibration record streams.
 
         Only step indices that appear in **every** calibration run are
@@ -129,8 +125,7 @@ class EnsembleBaseline:
             common = set(s.tolist()) if common is None else common & set(s.tolist())
         if not series or not common:
             raise ValueError(
-                f"No common step indices found for layer {layer!r}"
-                " across the calibration runs."
+                f"No common step indices found for layer {layer!r}" " across the calibration runs."
             )
         grid = np.asarray(sorted(common), dtype=np.int64)
         # Index every series onto the common grid.
@@ -142,9 +137,7 @@ class EnsembleBaseline:
         sigma = matrix.std(axis=0, ddof=1)
         return cls(layer=layer, steps=grid, mu=mu, sigma=sigma, n=len(series))
 
-    def standardize(
-        self, records: Iterable[dict]
-    ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    def standardize(self, records: Iterable[dict]) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
         """Return ``(steps, epochs, z)`` for a test record stream.
 
         Steps not present in :attr:`steps` and steps at which the
@@ -267,22 +260,6 @@ def online_cusum_alert(
 # ---------------------------------------------------------------------------
 #  Threshold calibration via empirical ARL_0
 # ---------------------------------------------------------------------------
-def _empirical_arl0(z_null: np.ndarray, *, k: float, h: float) -> float:
-    """Mean run length of two-sided CUSUM under the supplied null sample.
-
-    Each contiguous block of length ``len(z_null)`` is treated as one
-    independent realisation: CUSUM is run, the run length is the index
-    of the first crossing of ``h`` (or ``len(z_null)`` if no crossing).
-    Returns the *average* of these run lengths; censoring at the block
-    length matches Phase-II practice where observations beyond the
-    experiment horizon are unobserved.
-    """
-    s_pos, s_neg = cusum_statistic(z_null, k=k)
-    s_max = np.maximum(s_pos, s_neg)
-    cross = np.flatnonzero(s_max > h)
-    return float(cross[0] + 1) if cross.size > 0 else float(z_null.size)
-
-
 def calibrate_threshold(
     calibration_runs: Sequence[Iterable[dict]],
     layer: str,
@@ -324,19 +301,29 @@ def calibrate_threshold(
         if z.size > 0:
             pool_chunks.append(z)
     if not pool_chunks:
-        raise ValueError(
-            f"Leave-one-out null sample is empty for layer {layer!r}."
-        )
+        raise ValueError(f"Leave-one-out null sample is empty for layer {layer!r}.")
     pool = np.concatenate(pool_chunks)
-    block_length = block_length if block_length is not None else max(
-        int(8 * target_arl0), 1024
-    )
+    block_length = block_length if block_length is not None else max(int(8 * target_arl0), 1024)
+
+    # Precompute Monte-Carlo blocks and their CUSUM transforms once;
+    # the bisection then only re-evaluates the threshold crossing,
+    # which is an O(block_length) numpy operation per ``h``.
+    blocks = rng.choice(pool, size=(n_replicates, block_length), replace=True)
+    s_max_blocks = np.empty_like(blocks)
+    for r in range(n_replicates):
+        sp, sn = cusum_statistic(blocks[r], k=k)
+        np.maximum(sp, sn, out=s_max_blocks[r])
+
+    censored = float(block_length)
 
     def arl0_at(h: float) -> float:
         run_lengths = np.empty(n_replicates, dtype=np.float64)
         for r in range(n_replicates):
-            block = rng.choice(pool, size=block_length, replace=True)
-            run_lengths[r] = _empirical_arl0(block, k=k, h=h)
+            cross = np.argmax(s_max_blocks[r] > h)
+            if s_max_blocks[r, cross] > h:
+                run_lengths[r] = float(cross + 1)
+            else:
+                run_lengths[r] = censored
         return float(run_lengths.mean())
 
     # Bisection bracket.

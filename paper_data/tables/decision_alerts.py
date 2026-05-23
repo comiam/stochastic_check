@@ -184,10 +184,7 @@ def generate(paths: DataPaths, out_dir: Path) -> Path:
     lines: list[str] = []
     lines.append(r"\begin{tabular}{lllccc}")
     lines.append(r"\toprule")
-    lines.append(
-        r"Arch & Dataset & $\eta$ & "
-        r"Det.\ epoch (mean$\pm$std) & Alert rate & $h$ \\"
-    )
+    lines.append(r"Arch & Dataset & $\eta$ & " r"Det.\ epoch (mean$\pm$std) & Alert rate & $h$ \\")
     lines.append(r"\midrule")
     for arch, dataset, noise, alerted, n_seeds, h in rows:
         rate = (len(alerted) / n_seeds) if n_seeds > 0 else math.nan
@@ -197,9 +194,7 @@ def generate(paths: DataPaths, out_dir: Path) -> Path:
                     arch.replace("_", r"\_"),
                     dataset.replace("_", r"\_"),
                     f"${noise:g}$",
-                    fmt_mean_std(np.asarray(alerted, dtype=float), digits=1)
-                    if alerted
-                    else "---",
+                    fmt_mean_std(np.asarray(alerted, dtype=float), digits=1) if alerted else "---",
                     f"{rate:.2f}" if not math.isnan(rate) else "---",
                     f"{h:.2f}",
                 ]
