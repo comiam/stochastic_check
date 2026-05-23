@@ -21,6 +21,13 @@
 #   exp_b   --  training stage only (no estimator comparison); useful
 #               when you want to split the budget over multiple sessions
 #               and run the comparison separately via ``exp_a``.
+#   phase1_extension
+#           --  extend the Phase-I clean-label ensemble from S=10 to
+#               S=20 by training 60 additional (arch x dataset x seed)
+#               cells at eta=0.  Lowers CV(sigma_0) of the CUSUM
+#               calibration from 1/sqrt(2*9) ~ 0.24 to 1/sqrt(2*19)
+#               ~ 0.16.  Seeds default to 10..19 and can be overridden
+#               via ``EXT_SEEDS``.
 #   tables  --  rebuild every paper table from results/.
 #
 # Environment overrides
@@ -49,6 +56,13 @@ Modes:
   exp_b           Training stage only (no estimator comparison); pair
                   with a later ``exp_a`` to split the budget over
                   multiple sessions.
+  phase1_extension
+                  Train 60 extra clean-label (eta=0) cells -- 3 archs x
+                  2 datasets x 10 fresh seeds -- to grow the CUSUM
+                  Phase-I baseline ensemble from S=10 to S=20.  Only
+                  the training stage is dispatched (no Exp-A); the
+                  default ``EXT_SEEDS`` is ``10 11 ... 19`` and avoids
+                  collisions with the seeds 0..9 from ``full_run``.
   tables          Regenerate every paper artefact from results/.
 
 Environment overrides:
@@ -57,6 +71,10 @@ Environment overrides:
   SEEDS="0 1 2"   Restrict the seed axis of the sweep (default: 0..9).
                   Use to partition the 240-cell matrix across sessions
                   or machines without editing the script.
+  EXT_SEEDS="10 ... 19"
+                  Seed axis for ``phase1_extension`` (default: 10..19).
+                  Must be disjoint from the seeds used by ``full_run``
+                  to avoid overwriting existing run directories.
 
 Examples:
   ./run_all.sh diagnostic_run
@@ -95,6 +113,15 @@ SEEDS_RAW="${SEEDS:-0 1 2 3 4 5 6 7 8 9}"
 IFS=$' \t,' read -ra SEED_LIST <<< "$SEEDS_RAW"
 if [[ ${#SEED_LIST[@]} -eq 0 ]]; then
     echo "SEEDS is empty after parsing: '$SEEDS_RAW'" >&2
+    exit 2
+fi
+
+# Phase-I extension seeds: disjoint from SEEDS by default so reruns of
+# ``phase1_extension`` cannot clobber the publication sweep.
+EXT_SEEDS_RAW="${EXT_SEEDS:-10 11 12 13 14 15 16 17 18 19}"
+IFS=$' \t,' read -ra EXT_SEED_LIST <<< "$EXT_SEEDS_RAW"
+if [[ ${#EXT_SEED_LIST[@]} -eq 0 ]]; then
+    echo "EXT_SEEDS is empty after parsing: '$EXT_SEEDS_RAW'" >&2
     exit 2
 fi
 
@@ -197,6 +224,38 @@ run_exp_a_only() {
     echo "[exp_a] OK"
 }
 
+run_phase1_extension() {
+    # Extend the CUSUM Phase-I clean ensemble: 3 archs x 2 datasets x
+    # |EXT_SEED_LIST| extra eta=0 cells.  Only the training stage is
+    # scheduled -- the post-hoc Exp-A estimator comparison does not
+    # touch clean runs that are added solely for calibration.
+    echo "[phase1_extension] training extra clean-label cells (seeds=${EXT_SEED_LIST[*]})"
+    # Sanity check: refuse to overlap with the publication seed grid.
+    for s in "${EXT_SEED_LIST[@]}"; do
+        for s0 in "${SEED_LIST[@]}"; do
+            if [[ "$s" == "$s0" ]]; then
+                echo "[phase1_extension] EXT_SEEDS overlap SEEDS at seed=$s; aborting to avoid overwriting existing runs." >&2
+                exit 3
+            fi
+        done
+    done
+    ensure_datasets
+    python -m main sweep \
+        --archs resnet18 vgg11 resnet34 \
+        --datasets cifar10 cifar100 \
+        --noises 0.0 \
+        --seeds "${EXT_SEED_LIST[@]}" \
+        --epochs 30 \
+        --checkpoint-epochs 0 10 30 \
+        --only-stage train \
+        --workers-per-gpu "$WORKERS" \
+        --output-root results/exp_b \
+        "${GPU_ARGS[@]}"
+    python -m main aggregate --kind exp_b \
+        --root results/exp_b/runs --out results/exp_b/aggregate.json
+    echo "[phase1_extension] OK"
+}
+
 run_tables() {
     echo "[tables] regenerating paper artefacts"
     python -m paper_data.main --all
@@ -204,11 +263,12 @@ run_tables() {
 }
 
 case "$MODE" in
-    diagnostic_run) run_diagnostic ;;
-    full_run)       run_full_training ;;
-    exp_a)          run_exp_a_only ;;
-    exp_b)          run_exp_b_only ;;
-    tables)         run_tables ;;
+    diagnostic_run)    run_diagnostic ;;
+    full_run)          run_full_training ;;
+    exp_a)             run_exp_a_only ;;
+    exp_b)             run_exp_b_only ;;
+    phase1_extension)  run_phase1_extension ;;
+    tables)            run_tables ;;
     *)
         echo "Unknown mode: $MODE" >&2
         usage >&2
