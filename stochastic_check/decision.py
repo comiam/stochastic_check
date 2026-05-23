@@ -1,49 +1,66 @@
-"""Online :math:`3\\sigma` decision rule for the trace trajectory.
+"""Online decision rule on the trace trajectory.
 
-Section 7.2 of the paper specifies the on-line detector
+Section 7.2 of the paper monitors the layer-wise trace
+:math:`\\hat T_\\ell(t)` against a calibration ensemble of clean-label
+runs.  The trace is a *non-stationary* signal -- under :math:`H_0`
+(clean labels) it drifts with the LR schedule -- so a naive z-test
+against a fixed baseline window is ill-posed: the empirical
+:math:`\\sigma_0` underestimates the post-window dispersion and the
+false-positive rate saturates at one.
 
-    z_\\ell(t)  =  ( hat T_\\ell(t)  -  mu_0(\\ell) )  /  s_0(\\ell),
+The detector implemented here removes the drift component
+explicitly.  Given a calibration ensemble of :math:`S\\geq 2`
+clean-label runs we form the per-step Phase-I statistics
 
-where ``mu_0`` and ``s_0`` are the mean and the unbiased standard
-deviation of the **clean-label** trace trajectory of layer ``ell``,
-estimated on the first ``baseline_epochs`` of training.  An alert is
-fired at the first step ``t`` at which ``|z_\\ell(t)| >= threshold``;
-the conventional threshold is ``3``.
+    mu_0(t)     = (1/S)  sum_s  hat T_\\ell^{(s)}(t),
+    sigma_0(t)  = unbiased std over s,
 
-The function returns the alert step (or ``None`` if no alert), the
-alert epoch and the realised z-score, so that downstream tabulators
-can express the detection delay either in steps or in epochs.
+and standardise the test trajectory as
 
-The module is deliberately free of PyTorch and only takes the raw
+    z_t  =  ( hat T_\\ell(t)  -  mu_0(t) )  /  sigma_0(t),
+
+which is :math:`\\mathcal{N}(0,1)` asymptotically under :math:`H_0`.
+A two-sided cumulative-sum (CUSUM, Page 1954) detector is then
+applied to :math:`z_t`:
+
+    S^{+}_t = max( 0,  S^{+}_{t-1} + z_t - k ),
+    S^{-}_t = max( 0,  S^{-}_{t-1} - z_t - k ),
+    alert   <=>  max(S^{+}_t, S^{-}_t)  >  h.
+
+The reference value ``k`` is fixed to half the smallest shift the
+detector should react to (in units of :math:`\\sigma_0`); the
+default ``k = 0.5`` targets a :math:`1\\sigma` shift, which is the
+canonical Page-Hinkley setting.  The threshold ``h`` is calibrated
+empirically so that the average run length under :math:`H_0`
+(:math:`\\mathrm{ARL}_0`) attains a prescribed value.
+
+The module is intentionally free of PyTorch and works on the raw
 JSONL records produced by :class:`stochastic_check.training.Trainer`,
-so it can be reused both inside the training process (for live
-diagnostics) and post-hoc by the paper-table generators.
+so it can be reused both inside the training process and post-hoc
+by the paper-table generators.
 """
 
 from __future__ import annotations
 
 import math
-from collections.abc import Iterable
+from collections.abc import Iterable, Sequence
 from dataclasses import dataclass
 
 import numpy as np
 
 
-@dataclass(frozen=True)
-class AlertResult:
-    layer: str
-    alert_step: int | None
-    alert_epoch: int | None
-    z_score: float
-    baseline_mean: float
-    baseline_std: float
-    n_baseline: int
-
-
+# ---------------------------------------------------------------------------
+#  Low-level helpers
+# ---------------------------------------------------------------------------
 def _layer_series(
     records: Iterable[dict], layer: str
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
-    """Extract aligned ``(steps, epochs, traces)`` arrays for one layer."""
+    """Extract aligned ``(steps, epochs, traces)`` arrays for one layer.
+
+    Non-finite trace values are dropped.  The arrays are ordered by the
+    order of ``records``; callers that need monotonic ``step`` should
+    pre-sort.
+    """
     steps: list[int] = []
     epochs: list[int] = []
     values: list[float] = []
@@ -51,11 +68,15 @@ def _layer_series(
         v = (rec.get("trace") or {}).get(layer)
         if v is None:
             continue
-        if isinstance(v, float) and math.isnan(v):
+        try:
+            fv = float(v)
+        except (TypeError, ValueError):
+            continue
+        if not math.isfinite(fv):
             continue
         steps.append(int(rec["step"]))
         epochs.append(int(rec["epoch"]))
-        values.append(float(v))
+        values.append(fv)
     return (
         np.asarray(steps, dtype=np.int64),
         np.asarray(epochs, dtype=np.int64),
@@ -63,78 +84,269 @@ def _layer_series(
     )
 
 
-def online_3sigma_alert(
+# ---------------------------------------------------------------------------
+#  Phase-I baseline
+# ---------------------------------------------------------------------------
+@dataclass(frozen=True)
+class EnsembleBaseline:
+    """Per-step null statistics of layer ``layer`` over a calibration ensemble.
+
+    ``steps`` is the common grid (intersection of step indices observed
+    in every run); ``mu`` and ``sigma`` are the across-seed mean and
+    unbiased standard deviation evaluated on that grid; ``n`` is the
+    number of calibration runs.
+    """
+
+    layer: str
+    steps: np.ndarray
+    mu: np.ndarray
+    sigma: np.ndarray
+    n: int
+
+    @classmethod
+    def from_runs(
+        cls, calibration_runs: Sequence[Iterable[dict]], layer: str
+    ) -> EnsembleBaseline:
+        """Build the baseline from ``S`` calibration record streams.
+
+        Only step indices that appear in **every** calibration run are
+        retained, which keeps ``mu(t), sigma(t)`` balanced across seeds.
+        Requires ``S >= 2`` runs so that the unbiased standard deviation
+        is well defined.
+        """
+        if len(calibration_runs) < 2:
+            raise ValueError(
+                "EnsembleBaseline requires at least 2 calibration runs"
+                " for an unbiased dispersion estimate."
+            )
+        series: list[tuple[np.ndarray, np.ndarray]] = []
+        common: set[int] | None = None
+        for recs in calibration_runs:
+            s, _, v = _layer_series(recs, layer)
+            if s.size == 0:
+                continue
+            series.append((s, v))
+            common = set(s.tolist()) if common is None else common & set(s.tolist())
+        if not series or not common:
+            raise ValueError(
+                f"No common step indices found for layer {layer!r}"
+                " across the calibration runs."
+            )
+        grid = np.asarray(sorted(common), dtype=np.int64)
+        # Index every series onto the common grid.
+        matrix = np.empty((len(series), grid.size), dtype=np.float64)
+        for i, (s, v) in enumerate(series):
+            pos = {int(ss): j for j, ss in enumerate(s)}
+            matrix[i] = np.asarray([v[pos[int(t)]] for t in grid], dtype=np.float64)
+        mu = matrix.mean(axis=0)
+        sigma = matrix.std(axis=0, ddof=1)
+        return cls(layer=layer, steps=grid, mu=mu, sigma=sigma, n=len(series))
+
+    def standardize(
+        self, records: Iterable[dict]
+    ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+        """Return ``(steps, epochs, z)`` for a test record stream.
+
+        Steps not present in :attr:`steps` and steps at which the
+        baseline ``sigma`` is non-positive are dropped: a finite
+        baseline dispersion is mandatory for a well-defined z-score.
+        """
+        s, e, v = _layer_series(records, self.layer)
+        if s.size == 0:
+            return s, e, np.empty(0, dtype=np.float64)
+        index = {int(t): j for j, t in enumerate(self.steps)}
+        keep_s: list[int] = []
+        keep_e: list[int] = []
+        keep_z: list[float] = []
+        for ss, ee, vv in zip(s, e, v, strict=True):
+            j = index.get(int(ss))
+            if j is None:
+                continue
+            sd = float(self.sigma[j])
+            if not math.isfinite(sd) or sd <= 0.0:
+                continue
+            keep_s.append(int(ss))
+            keep_e.append(int(ee))
+            keep_z.append((vv - float(self.mu[j])) / sd)
+        return (
+            np.asarray(keep_s, dtype=np.int64),
+            np.asarray(keep_e, dtype=np.int64),
+            np.asarray(keep_z, dtype=np.float64),
+        )
+
+
+# ---------------------------------------------------------------------------
+#  CUSUM detector
+# ---------------------------------------------------------------------------
+@dataclass(frozen=True)
+class CUSUMAlert:
+    """Outcome of one CUSUM monitoring pass on a standardised stream."""
+
+    layer: str
+    alert_step: int | None
+    alert_epoch: int | None
+    s_max: float
+    k: float
+    h: float
+    n_observations: int
+
+
+def cusum_statistic(z: np.ndarray, *, k: float) -> tuple[np.ndarray, np.ndarray]:
+    """Two-sided Page-Hinkley CUSUM transform of a standardised signal.
+
+    Returns ``(S_plus, S_minus)`` with ``S_plus[t] = max(0, S_plus[t-1]
+    + z[t] - k)`` and ``S_minus[t] = max(0, S_minus[t-1] - z[t] - k)``,
+    both initialised at zero.
+    """
+    if k < 0:
+        raise ValueError("CUSUM reference value k must be non-negative.")
+    n = int(z.size)
+    s_pos = np.zeros(n, dtype=np.float64)
+    s_neg = np.zeros(n, dtype=np.float64)
+    if n == 0:
+        return s_pos, s_neg
+    prev_p = 0.0
+    prev_n = 0.0
+    for t in range(n):
+        prev_p = max(0.0, prev_p + float(z[t]) - k)
+        prev_n = max(0.0, prev_n - float(z[t]) - k)
+        s_pos[t] = prev_p
+        s_neg[t] = prev_n
+    return s_pos, s_neg
+
+
+def online_cusum_alert(
     records: Iterable[dict],
-    layer: str,
+    baseline: EnsembleBaseline,
     *,
-    baseline_epochs: int = 5,
-    threshold: float = 3.0,
-) -> AlertResult:
-    """First-passage detector on the clean-label baseline statistics.
+    k: float = 0.5,
+    h: float,
+) -> CUSUMAlert:
+    """First-passage CUSUM detector for one layer of a test run.
 
     Parameters
     ----------
     records
-        Iterable of JSONL records ``{step, epoch, trace: {layer: ...}}``
-        from the per-step trace stream of a single (clean or noisy)
-        run.  The baseline is computed from the **same** stream on the
-        first ``baseline_epochs``; this matches the paper's stipulation
-        that the detector is calibrated on the clean prefix of the
-        training trajectory.
-    layer
-        Name of the layer to monitor.
-    baseline_epochs
-        Number of leading epochs used to estimate ``mu_0`` and ``s_0``.
-    threshold
-        Critical absolute z-score; ``3`` reproduces the paper's
-        :math:`3\\sigma` rule.
-
-    Returns
-    -------
-    :class:`AlertResult`
-        ``alert_step`` and ``alert_epoch`` are ``None`` when the trace
-        never crosses the threshold; ``z_score`` is then the maximum
-        absolute z-score actually observed.
+        Per-step trace stream of the run under test.
+    baseline
+        Phase-I ensemble baseline produced by
+        :meth:`EnsembleBaseline.from_runs`.
+    k
+        Reference value (slack) of the CUSUM; default ``0.5``.
+    h
+        Decision threshold; calibrated via :func:`calibrate_threshold`.
     """
-    steps, epochs, traces = _layer_series(list(records), layer)
-    if traces.size == 0:
-        return AlertResult(layer, None, None, math.nan, math.nan, math.nan, 0)
-
-    in_baseline = epochs <= baseline_epochs
-    baseline = traces[in_baseline]
-    if baseline.size < 2:
-        # Not enough samples to estimate dispersion; declare no alert.
-        return AlertResult(layer, None, None, math.nan, math.nan, math.nan, int(baseline.size))
-
-    mu0 = float(baseline.mean())
-    s0 = float(baseline.std(ddof=1))
-    if s0 == 0.0:
-        return AlertResult(layer, None, None, math.nan, mu0, 0.0, int(baseline.size))
-
-    z = (traces - mu0) / s0
-    crossed = np.abs(z) >= threshold
-    crossed_after_baseline = crossed & ~in_baseline
-    if not crossed_after_baseline.any():
-        # No alert; report the largest excursion observed so far for
-        # diagnostics.
-        idx_max = int(np.argmax(np.abs(z)))
-        return AlertResult(
-            layer,
+    steps, epochs, z = baseline.standardize(records)
+    s_pos, s_neg = cusum_statistic(z, k=k)
+    s_max_traj = np.maximum(s_pos, s_neg)
+    if s_max_traj.size == 0:
+        return CUSUMAlert(baseline.layer, None, None, math.nan, k, h, 0)
+    crossed = s_max_traj > h
+    if not crossed.any():
+        return CUSUMAlert(
+            baseline.layer,
             None,
             None,
-            float(z[idx_max]),
-            mu0,
-            s0,
-            int(baseline.size),
+            float(s_max_traj.max()),
+            k,
+            h,
+            int(z.size),
         )
-
-    idx = int(np.argmax(crossed_after_baseline))
-    return AlertResult(
-        layer,
+    idx = int(np.argmax(crossed))
+    return CUSUMAlert(
+        baseline.layer,
         int(steps[idx]),
         int(epochs[idx]),
-        float(z[idx]),
-        mu0,
-        s0,
-        int(baseline.size),
+        float(s_max_traj[idx]),
+        k,
+        h,
+        int(z.size),
     )
+
+
+# ---------------------------------------------------------------------------
+#  Threshold calibration via empirical ARL_0
+# ---------------------------------------------------------------------------
+def _empirical_arl0(z_null: np.ndarray, *, k: float, h: float) -> float:
+    """Mean run length of two-sided CUSUM under the supplied null sample.
+
+    Each contiguous block of length ``len(z_null)`` is treated as one
+    independent realisation: CUSUM is run, the run length is the index
+    of the first crossing of ``h`` (or ``len(z_null)`` if no crossing).
+    Returns the *average* of these run lengths; censoring at the block
+    length matches Phase-II practice where observations beyond the
+    experiment horizon are unobserved.
+    """
+    s_pos, s_neg = cusum_statistic(z_null, k=k)
+    s_max = np.maximum(s_pos, s_neg)
+    cross = np.flatnonzero(s_max > h)
+    return float(cross[0] + 1) if cross.size > 0 else float(z_null.size)
+
+
+def calibrate_threshold(
+    calibration_runs: Sequence[Iterable[dict]],
+    layer: str,
+    *,
+    k: float = 0.5,
+    target_arl0: float,
+    n_replicates: int = 200,
+    block_length: int | None = None,
+    rng: np.random.Generator | None = None,
+) -> float:
+    """Bisection on ``h`` matching empirical ARL\\(_0\\) to ``target_arl0``.
+
+    The null sample is generated by leave-one-out standardisation on
+    the calibration ensemble: each run is z-scored against the baseline
+    built from the remaining :math:`S-1` runs, and the concatenated
+    z-scores form the pool of null observations.  ARL\\(_0\\) is then
+    estimated by ``n_replicates`` Monte-Carlo blocks of length
+    ``block_length`` (default: ``8 * target_arl0``) drawn with
+    replacement from that pool.
+
+    Resampling without preserving temporal order is justified because
+    the per-step centring already removes the dominant LR-driven
+    autocorrelation; the residual z-stream is approximately iid under
+    :math:`H_0`.
+    """
+    if len(calibration_runs) < 3:
+        raise ValueError(
+            "calibrate_threshold needs at least 3 calibration runs"
+            " for a leave-one-out null sample."
+        )
+    rng = rng if rng is not None else np.random.default_rng(0)
+    cached = [list(r) for r in calibration_runs]
+    pool_chunks: list[np.ndarray] = []
+    for i in range(len(cached)):
+        holdout = cached[i]
+        rest = [r for j, r in enumerate(cached) if j != i]
+        loo_baseline = EnsembleBaseline.from_runs(rest, layer)
+        _, _, z = loo_baseline.standardize(holdout)
+        if z.size > 0:
+            pool_chunks.append(z)
+    if not pool_chunks:
+        raise ValueError(
+            f"Leave-one-out null sample is empty for layer {layer!r}."
+        )
+    pool = np.concatenate(pool_chunks)
+    block_length = block_length if block_length is not None else max(
+        int(8 * target_arl0), 1024
+    )
+
+    def arl0_at(h: float) -> float:
+        run_lengths = np.empty(n_replicates, dtype=np.float64)
+        for r in range(n_replicates):
+            block = rng.choice(pool, size=block_length, replace=True)
+            run_lengths[r] = _empirical_arl0(block, k=k, h=h)
+        return float(run_lengths.mean())
+
+    # Bisection bracket.
+    lo, hi = 0.1, 100.0
+    for _ in range(64):
+        mid = 0.5 * (lo + hi)
+        if arl0_at(mid) < target_arl0:
+            lo = mid
+        else:
+            hi = mid
+        if hi - lo < 1e-3:
+            break
+    return 0.5 * (lo + hi)
