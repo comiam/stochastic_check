@@ -33,27 +33,33 @@ class LinearLoss(nn.Module):
     """Wraps theta as a parameter so autograd HVPs work."""
 
     def __init__(self, P: int) -> None:
+        """Expose a vector of trainable parameters for a quadratic loss."""
         super().__init__()
         self.theta = nn.Parameter(torch.zeros(P))
 
     def forward(self, A: torch.Tensor) -> torch.Tensor:  # noqa: N803
+        """Map synthetic inputs through the trainable parameter vector."""
         # A is (N, P); we treat A as "input" so that the trainer-style API
         # of estimate(model, layers, x, y, loss_fn) maps cleanly.
         return A @ self.theta
 
 
 def _make_problem(P: int = 50, rank: int | None = None, seed: int = 0):
+    """Construct a quadratic loss with known Hessian trace and rank."""
     torch.manual_seed(seed)
     if rank is None:
         rank = P
+
     U = torch.randn(rank, P)
     A = U  # (rank, P), H = A^T A has rank <= rank
     b = torch.randn(rank)
+
     model = LinearLoss(P)
     layers = collect_layers(model)
     assert len(layers) == 1
 
     def loss_fn(pred: torch.Tensor, target: torch.Tensor) -> torch.Tensor:
+        """Return the unnormalized quadratic loss whose Hessian is A^T A."""
         return 0.5 * ((pred - target) ** 2).sum()
 
     exact_trace = float((A * A).sum())  # ||A||_F^2 = tr(A^T A)
@@ -66,20 +72,24 @@ def _make_problem(P: int = 50, rank: int | None = None, seed: int = 0):
 
 
 def test_hutchinson_unbiased_full_rank():
+    """Recover the full-rank trace within the sampling tolerance."""
     torch.manual_seed(0)
     model, layers, A, b, loss_fn, exact = _make_problem(P=40, rank=40)
     estimator = HutchinsonTraceEstimator(n_probes=500)
     out = estimator.estimate(model, layers, A, b, loss_fn)
     name = layers[0].name
+
     assert out[name] == pytest.approx(exact, rel=0.10)
 
 
 def test_hutchinson_variance_decreases_with_K():
+    """Reduce empirical trace variance when increasing the probe budget."""
     torch.manual_seed(1)
     model, layers, A, b, loss_fn, _ = _make_problem(P=30, rank=30)
     name = layers[0].name
 
     def std_at(K: int, n_trials: int = 20) -> float:
+        """Measure variability across independent probe draws at a fixed budget."""
         vals = []
         for _ in range(n_trials):
             est = HutchinsonTraceEstimator(n_probes=K)
@@ -98,6 +108,7 @@ def test_hutchinson_variance_decreases_with_K():
 
 
 def test_hutch_plus_plus_low_rank_variance_reduction():
+    """Keep both means near the low-rank trace while reducing Hutch++ variance."""
     torch.manual_seed(2)
     model, layers, A, b, loss_fn, exact = _make_problem(P=60, rank=5)
     name = layers[0].name
@@ -126,6 +137,7 @@ def test_hutch_plus_plus_low_rank_variance_reduction():
 
 
 def test_bl_diag_matches_hutchinson_per_probe():
+    """Obtain equal estimates when both methods consume the same probes."""
     torch.manual_seed(3)
     model, layers, A, b, loss_fn, _ = _make_problem(P=20, rank=20)
     name = layers[0].name

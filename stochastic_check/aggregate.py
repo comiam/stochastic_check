@@ -24,12 +24,15 @@ logger = logging.getLogger(__name__)
 def aggregate_runs(root: Path) -> dict[str, Any]:
     """Walk ``root`` for ``*/final.json`` files and build an index."""
     runs: list[dict[str, Any]] = []
+
     for final_path in sorted(root.glob("*/final.json")):
         try:
             data = load_json(final_path)
+
         except (OSError, ValueError) as exc:
             logger.warning("Skipping unreadable run %s: %s", final_path, exc)
             continue
+
         cfg = data.get("config", {})
         runs.append(
             {
@@ -43,18 +46,22 @@ def aggregate_runs(root: Path) -> dict[str, Any]:
                 "n_layers": data.get("n_layers"),
             }
         )
+
     return {"n_runs": len(runs), "root": str(root), "runs": runs}
 
 
 def aggregate_comparisons(root: Path) -> dict[str, Any]:
     """Walk ``root`` for ``*/comparison.json`` files and build an index."""
     runs: list[dict[str, Any]] = []
+
     for path in sorted(root.glob("*/comparison.json")):
         try:
             data = load_json(path)
+
         except (OSError, ValueError) as exc:
             logger.warning("Skipping unreadable comparison %s: %s", path, exc)
             continue
+
         runs.append(
             {
                 "run_dir": str(path.parent.relative_to(root)),
@@ -62,10 +69,12 @@ def aggregate_comparisons(root: Path) -> dict[str, Any]:
                 "checkpoints": list(data.get("checkpoints", {}).keys()),
             }
         )
+
     return {"n_runs": len(runs), "root": str(root), "runs": runs}
 
 
 def main(argv: list[str] | None = None) -> None:
+    """Write a training or comparison index from the selected run directory."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", type=Path, required=True)
     parser.add_argument(
@@ -81,6 +90,7 @@ def main(argv: list[str] | None = None) -> None:
         agg = aggregate_runs(args.root)
     else:
         agg = aggregate_comparisons(args.root)
+
     dump_json(agg, args.out)
     logger.info("Wrote aggregate index with %d runs to %s", agg["n_runs"], args.out)
 

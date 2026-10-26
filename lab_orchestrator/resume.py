@@ -1,12 +1,58 @@
-"""Scan result directories for completed (name, seed) pairs."""
+"""Find completed name/seed pairs in timestamped result directories."""
 
 from __future__ import annotations
 
 import json
 import logging
 import os
+from collections.abc import Iterator
 
 logger = logging.getLogger(__name__)
+
+
+def _result_directories(results_dir: str) -> Iterator[tuple[str, str]]:
+    """Yield experiment directories beneath timestamp directories."""
+    for timestamp in os.listdir(results_dir):
+        timestamp_path = os.path.join(results_dir, timestamp)
+        if not os.path.isdir(timestamp_path):
+            continue
+
+        for name in os.listdir(timestamp_path):
+            path = os.path.join(timestamp_path, name)
+            if os.path.isdir(path):
+                yield name, path
+
+
+def _valid_result(path: str) -> bool:
+    """Reject unreadable or malformed JSON without hiding valid completed files."""
+    try:
+        with open(path) as stream:
+            json.load(stream)
+
+    except (json.JSONDecodeError, OSError):
+        logger.warning("Skipping corrupt/incomplete result: %s", path)
+        return False
+
+    return True
+
+
+def _completed_seeds(
+    path: str, prefix: str, suffix: str, validate: bool
+) -> Iterator[int]:
+    """Read seed values from matching filenames, optionally validating contents."""
+    for filename in os.listdir(path):
+        if not (filename.startswith(prefix) and filename.endswith(suffix)):
+            continue
+
+        try:
+            seed = int(filename[len(prefix) : -len(suffix)])
+        except ValueError:
+            continue
+
+        if validate and not _valid_result(os.path.join(path, filename)):
+            continue
+
+        yield seed
 
 
 def scan_completed(
@@ -16,65 +62,18 @@ def scan_completed(
     seed_suffix: str = ".json",
     validate: bool = False,
 ) -> set[tuple[str, int]]:
-    """Walk *results_dir* for completed ``(name, seed)`` pairs.
+    """Scan results_dir/timestamp/name/seed_N.json for completed runs.
 
-    Expected layout::
-
-        results_dir/
-          <timestamp>/
-            <name>/
-              seed_42.json
-              seed_43.json
-
-    A seed is considered done when ``{seed_prefix}{N}{seed_suffix}``
-    exists under a name directory.
-
-    Parameters
-    ----------
-    results_dir : str
-        Root directory to scan.
-    seed_prefix, seed_suffix : str
-        Filename pattern for completed seed files.
-    validate : bool
-        When *True*, attempt to parse each seed file as JSON and skip
-        files that are empty or contain invalid JSON.  Useful for
-        detecting incomplete writes from crashed tasks.
-
-    Returns
-    -------
-    set[tuple[str, int]]
-        ``(name, seed_value)`` pairs.
+    Optional JSON validation excludes interrupted or corrupt result files.
+    Existing directory and filename traversal order is retained.
     """
     done: set[tuple[str, int]] = set()
     if not os.path.isdir(results_dir):
         logger.warning("results_dir %r does not exist, nothing to skip", results_dir)
         return done
 
-    for ts_dir in os.listdir(results_dir):
-        ts_path = os.path.join(results_dir, ts_dir)
-        if not os.path.isdir(ts_path):
-            continue
-        for name in os.listdir(ts_path):
-            name_path = os.path.join(ts_path, name)
-            if not os.path.isdir(name_path):
-                continue
-            for fname in os.listdir(name_path):
-                if fname.startswith(seed_prefix) and fname.endswith(seed_suffix):
-                    seed_str = fname[len(seed_prefix) : -len(seed_suffix)]
-                    try:
-                        seed_val = int(seed_str)
-                    except ValueError:
-                        continue
-                    if validate:
-                        fpath = os.path.join(name_path, fname)
-                        try:
-                            with open(fpath) as f:
-                                json.load(f)
-                        except (json.JSONDecodeError, OSError):
-                            logger.warning(
-                                "Skipping corrupt/incomplete result: %s", fpath
-                            )
-                            continue
-                    done.add((name, seed_val))
+    for name, path in _result_directories(results_dir):
+        for seed in _completed_seeds(path, seed_prefix, seed_suffix, validate):
+            done.add((name, seed))
 
     return done

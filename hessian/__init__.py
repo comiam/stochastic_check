@@ -1,3 +1,5 @@
+"""Expose Hessian estimators, curvature metrics, and result containers."""
+
 from .exact import ExactBlockHessian
 from .gn_decomposition import ExactGNDecomposition, StochasticGNGapEstimator
 from .metrics import (

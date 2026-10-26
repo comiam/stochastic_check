@@ -29,6 +29,7 @@ _STATS: dict[str, tuple[tuple[float, float, float], tuple[float, float, float]]]
 def _build_transforms(
     dataset: str,
 ) -> tuple[T.Compose, T.Compose]:
+    """Build augmented training and deterministic validation transforms."""
     mean, std = _STATS[dataset]
     train_tf = T.Compose(
         [
@@ -53,29 +54,26 @@ def corrupt_labels(
     num_classes: int,
     seed: int,
 ) -> np.ndarray:
-    """Inject symmetric label noise.
+    """Return copied labels with independent symmetric flips.
 
-    For each index ``i``, with probability ``noise_rate`` replace the
-    original label by a label sampled uniformly from
-    ``{0, ..., num_classes - 1} \\ {original}``.  With probability
-    ``1 - noise_rate`` the label is kept.
-
-    Returns
-    -------
-    np.ndarray of shape ``(N,)`` with the corrupted integer labels.
+    Each selected label is replaced uniformly by one of the other classes;
+    the original label is retained with probability 1 - noise_rate.
     """
     if not 0.0 <= noise_rate < 1.0:
         raise ValueError(f"noise_rate must be in [0, 1), got {noise_rate}")
+
     rng = np.random.default_rng(seed)
     arr = np.asarray(targets, dtype=np.int64).copy()
     if noise_rate == 0.0:
         return arr
+
     n = len(arr)
     flip_mask = rng.random(n) < noise_rate
     n_flip = int(flip_mask.sum())
     if n_flip == 0:
         return arr
-    # For each flipped index pick a new label uniformly from the other classes.
+
+    # Offsets exclude the original label while remaining uniform over alternatives.
     offsets = rng.integers(1, num_classes, size=n_flip)
     arr[flip_mask] = (arr[flip_mask] + offsets) % num_classes
     return arr
@@ -87,6 +85,7 @@ def corrupt_labels(
 
 
 def _get_dataset_cls(dataset: str) -> type[torchvision.datasets.VisionDataset]:
+    """Resolve the requested CIFAR dataset class."""
     return {
         "cifar10": torchvision.datasets.CIFAR10,
         "cifar100": torchvision.datasets.CIFAR100,
@@ -106,6 +105,14 @@ def ensure_datasets_downloaded(data_root: str = "./data") -> None:
     for ds_cls in (torchvision.datasets.CIFAR10, torchvision.datasets.CIFAR100):
         ds_cls(data_root, train=True, download=True)
         ds_cls(data_root, train=False, download=True)
+
+
+def _replace_training_labels(dataset, noise_rate, num_classes, seed) -> None:
+    """Apply noise while retaining a separate copy of the clean labels."""
+    clean = np.asarray(dataset.targets, dtype=np.int64).copy()
+    noisy = corrupt_labels(clean, noise_rate, num_classes, seed=seed)
+    dataset.targets = noisy.tolist()
+    dataset.clean_targets = clean
 
 
 def get_loaders(
@@ -129,10 +136,7 @@ def get_loaders(
     val_ds = ds_cls(data_root, train=False, download=True, transform=val_tf)
 
     num_classes = 10 if dataset == "cifar10" else 100
-    clean_targets = np.asarray(train_ds.targets, dtype=np.int64).copy()
-    noisy_targets = corrupt_labels(clean_targets, noise_rate, num_classes, seed=noise_seed)
-    train_ds.targets = noisy_targets.tolist()
-    train_ds.clean_targets = clean_targets  # type: ignore[attr-defined]
+    _replace_training_labels(train_ds, noise_rate, num_classes, noise_seed)
 
     g = torch.Generator()
     g.manual_seed(noise_seed)
@@ -164,23 +168,24 @@ def get_loaders(
 def sample_hessian_batch(
     loader: DataLoader, batch_size: int, device: torch.device
 ) -> tuple[torch.Tensor, torch.Tensor]:
-    """Concatenate batches from ``loader`` until ``batch_size`` samples
-    are collected, then move to ``device``.
+    """Collect a fixed-size batch and move it to the requested device.
 
-    Used to assemble a fixed-size deterministic batch for the trace
-    estimator at each measurement checkpoint -- the batch is reused
-    across estimators in the comparison so that variance comes solely
-    from the probe distribution.
+    Reusing the batch across estimators isolates probe variance from
+    variation in the input data.
     """
     xs: list[torch.Tensor] = []
     ys: list[torch.Tensor] = []
     n = 0
+
     for x, y in loader:
         xs.append(x)
         ys.append(y)
         n += x.size(0)
+
         if n >= batch_size:
             break
+
     x_cat = torch.cat(xs)[:batch_size].to(device, non_blocking=True)
     y_cat = torch.cat(ys)[:batch_size].to(device, non_blocking=True)
+
     return x_cat, y_cat

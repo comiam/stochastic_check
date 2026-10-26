@@ -1,0 +1,86 @@
+{
+  "config": {
+    "arch": "resnet34",
+    "dataset": "cifar10",
+    "training": {
+      "lr": 0.1,
+      "batch_size": 128,
+      "epochs": 30,
+      "momentum": 0.9,
+      "weight_decay": 0.0005,
+      "scheduler": "cosine",
+      "grad_clip": null,
+      "metric_interval_steps": 100,
+      "seed": 8,
+      "noise_rate": 0.6,
+      "checkpoint_epochs": [
+        0,
+        10,
+        30
+      ],
+      "checkpoint_labels": [
+        "init",
+        "mid",
+        "final"
+      ]
+    },
+    "estimator": {
+      "name": "hutchinson",
+      "n_probes": 10,
+      "n_orth_frac": 0.3333333333333333,
+      "hessian_batch_size": 128
+    },
+    "output_dir": "results/exp_b_rerun/runs"
+  },
+  "checkpoint_epochs": [
+    [
+      "init",
+      0
+    ],
+    [
+      "ep10",
+      10
+    ],
+    [
+      "final",
+      30
+    ]
+  ],
+  "train_summary": {
+    "epochs": 30,
+    "global_steps": 11700,
+    "snapshots": {
+      "init": {
+        "label": "init",
+        "epoch": 0,
+        "step": 0,
+        "path": "results/exp_b_rerun/runs/arch=resnet34_dataset=cifar10_noise=0.60_seed=8/snapshots/init.pt",
+        "val_loss": 43.53291573486328,
+        "val_acc": 0.1008
+      },
+      "ep10": {
+        "label": "ep10",
+        "epoch": 10,
+        "step": 3900,
+        "path": "results/exp_b_rerun/runs/arch=resnet34_dataset=cifar10_noise=0.60_seed=8/snapshots/ep10.pt",
+        "val_loss": 1.9898631834030152,
+        "val_acc": 0.3792
+      },
+      "final": {
+        "label": "final",
+        "epoch": 30,
+        "step": 11700,
+        "path": "results/exp_b_rerun/runs/arch=resnet34_dataset=cifar10_noise=0.60_seed=8/snapshots/final.pt",
+        "val_loss": 1.3360082822799682,
+        "val_acc": 0.7339
+      }
+    },
+    "final_eval": {
+      "val_loss": 1.3360082822799682,
+      "val_acc": 0.7339
+    }
+  },
+  "wallclock_s": 3146.5615331481677,
+  "num_classes": 10,
+  "n_layers": 73
+}

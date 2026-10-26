@@ -51,30 +51,11 @@ def set_seed(
     frameworks: Sequence[str] | None = None,
     warn_missing: bool = False,
 ) -> list[str]:
-    """Fix random seed across available ML frameworks.
+    """Seed the selected available frameworks and return their names.
 
-    Parameters
-    ----------
-    seed : int
-        Seed value.
-    deterministic : bool
-        When *True*, also enable strict CUDA determinism:
-
-        - ``torch.use_deterministic_algorithms(True)``
-        - ``CUBLAS_WORKSPACE_CONFIG=:4096:8``
-        - ``TF_DETERMINISTIC_OPS=1``
-
-        This may decrease performance but ensures bitwise reproducibility.
-    frameworks : sequence of str, optional
-        Subset of ``("numpy", "torch", "tensorflow", "jax")`` to seed.
-        Default: seed all that are importable.
-    warn_missing : bool
-        Log a warning for each requested but missing framework.
-
-    Returns
-    -------
-    list[str]
-        Names of frameworks that were actually seeded.
+    Deterministic mode enables PyTorch/CUDA and TensorFlow controls, trading
+    throughput for reproducibility. Missing frameworks are ignored unless
+    warn_missing requests a log message; stdlib random is always seeded.
     """
     random.seed(seed)
     seeded: list[str] = ["random"]
@@ -86,16 +67,20 @@ def set_seed(
 
     for name in targets:
         fn = _SEEDERS.get(name)
+
         if fn is None:
             if warn_missing:
                 logger.warning("Unknown framework %r - skipped", name)
             continue
+
         try:
             fn(seed, deterministic)
             seeded.append(name)
+
         except ImportError:
             if warn_missing:
                 logger.warning("%s not installed - skipped", name)
+
         except Exception:
             logger.exception("Failed to seed %s", name)
 
@@ -108,33 +93,41 @@ def set_seed(
 
 
 def _seed_numpy(seed: int, _deterministic: bool) -> None:
+    """Seed NumPy when installed."""
     if np is None:
         raise ImportError("numpy")
     np.random.seed(seed)
 
 
 def _seed_torch(seed: int, deterministic: bool) -> None:
+    """Seed PyTorch CPU/CUDA and optionally enable deterministic kernels."""
     if torch is None:
         raise ImportError("torch")
     torch.manual_seed(seed)
+
     if torch.cuda.is_available():
         torch.cuda.manual_seed(seed)
         torch.cuda.manual_seed_all(seed)
+
         if deterministic:
             torch.backends.cudnn.deterministic = True
             torch.backends.cudnn.benchmark = False
+
     if deterministic:
         torch.use_deterministic_algorithms(True)
 
 
 def _seed_tensorflow(seed: int, deterministic: bool) -> None:
+    """Seed TensorFlow and preserve its optional determinism fallback."""
     if tf is None:
         raise ImportError("tensorflow")
     tf.random.set_seed(seed)
+
     if deterministic:
         # Env var is read at import time; set for child processes
         # that have not yet imported tensorflow.
         os.environ["TF_DETERMINISTIC_OPS"] = "1"
+
         try:
             tf.config.experimental.enable_op_determinism()
         except AttributeError:
@@ -145,6 +138,7 @@ def _seed_tensorflow(seed: int, deterministic: bool) -> None:
 
 
 def _seed_jax(seed: int, _deterministic: bool) -> None:
+    """Seed NumPy and create a JAX key that callers must split before use."""
     if jax is None:
         raise ImportError("jax")
     # JAX uses explicit PRNG keys; we store a default for user code.

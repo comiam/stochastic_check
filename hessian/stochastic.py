@@ -1,5 +1,4 @@
-"""
-Stochastic estimation of ||H^f_{v,w}||_F via Hutchinson + HVP.
+"""Estimate ||H^f_{v,w}||_F through Hutchinson probes and HVPs.
 
 Frobenius norm estimation without building the full matrix:
   ||H||_F^2 = tr(H^T H) ~= (1/m) sum_k z_k^T H^T H z_k = (1/m) sum_k ||H z_k||^2
@@ -38,6 +37,7 @@ class StochasticHessianEstimator:
         n_probes: int = 30,
         n_power_iter: int = 20,
     ) -> None:
+        """Keep the segmented model and both stochastic iteration budgets."""
         self._model = model
         self._loss_fn = loss_fn
         self._n_probes = n_probes
@@ -241,14 +241,17 @@ class StochasticHessianEstimator:
             Estimate of ||H_avg||_F^2.
         """
         frob_sq = 0.0
+
         for _ in range(self._n_probes):
             z = torch.randint(0, 2, (d_w,), device=device).float() * 2 - 1
             z_batch = z.reshape(1, *f_w_graph.shape[1:]).expand_as(f_w_graph)
             dot = (grad_fw * z_batch).sum()
             hvp = torch.autograd.grad(dot, f_v, retain_graph=True)[0]
+
             # hvp[b] = (1/B) H_b z, sum -> (1/B) sum_b H_b z = H_avg z
             Hz = hvp.sum(0)
             frob_sq += (Hz**2).sum().item()
+
         return frob_sq / self._n_probes
 
     # ------------------------------------------------------------------
@@ -320,8 +323,10 @@ class StochasticHessianEstimator:
         r_vv = self.estimate_block_frob_norm(x, y, layer_v, layer_v)
         r_ww = self.estimate_block_frob_norm(x, y, layer_w, layer_w)
         denom = (r_vv * r_ww) ** 0.5
+
         if denom < 1e-12:
             return math.nan
         # C > 1 is possible when H^T != 0 (non-PSD regime);
         # clamping with min(., 1) would hide information about the tensor component.
+
         return r_vw / denom

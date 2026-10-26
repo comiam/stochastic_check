@@ -1,3 +1,5 @@
+"""Result containers for Hessian blocks and Gauss-Newton decompositions."""
+
 from __future__ import annotations
 
 import math
@@ -11,54 +13,58 @@ LayerID = str
 
 @dataclass
 class HessianBlock:
-    """A single block H^f_{v,w} of the inter-layer Hessian."""
+    """Store a single inter-layer Hessian block with its layer identifiers."""
 
     layer_v: LayerID
     layer_w: LayerID
-    matrix: Tensor  # shape (d_v, d_w)
+    matrix: Tensor
 
     @property
     def shape(self) -> tuple[int, int]:
+        """Return the two block dimensions."""
         return tuple(self.matrix.shape)  # type: ignore[return-value]
 
     @property
     def frobenius_norm(self) -> float:
+        """Return the Frobenius norm of the block."""
         return torch.linalg.norm(self.matrix, ord="fro").item()
 
     @property
     def spectral_norm(self) -> float:
+        """Return the spectral norm of the block."""
         return torch.linalg.norm(self.matrix, ord=2).item()
 
     @property
     def stable_rank(self) -> float:
-        """||H||_F^2 / ||H||_2^2 - effective dimensionality of the block.
+        """Return squared Frobenius/spectral norm ratio, or NaN for a zero block.
 
-        For a non-zero matrix always D in [1, rank(H)].
-        For a zero matrix (||H||_2 < eps) returns NaN (D is undefined).
+        This effective dimension lies between one and rank(H) for nonzero H.
         """
-        sn = self.spectral_norm
-        if sn < 1e-12:
+        spectral = self.spectral_norm
+        if spectral < 1e-12:
             return math.nan
-        fn = self.frobenius_norm
-        return (fn / sn) ** 2
+
+        frobenius = self.frobenius_norm
+        return (frobenius / spectral) ** 2
 
 
 @dataclass
 class GNGapResult:
-    """Result of the H = H^GN + H^T decomposition for a single block (v,w)."""
+    """Store norms from H = H_GN + H_tensor and their relative gap."""
 
-    gap: float  # ||H^T||_F / (||H^GN||_F + eps)
-    frob_full: float  # ||H^f||_F
-    frob_gn: float  # ||H^GN||_F
-    frob_tensor: float  # ||H^T||_F
+    gap: float
+    frob_full: float
+    frob_gn: float
+    frob_tensor: float
 
 
 @dataclass
 class BlockHessianResult:
-    """Collection of inter-layer Hessian blocks for all layer pairs."""
+    """Collect inter-layer blocks and their feature dimensions."""
 
     blocks: dict[tuple[LayerID, LayerID], HessianBlock]
     layer_dims: dict[LayerID, int]
 
     def get_block(self, v: LayerID, w: LayerID) -> HessianBlock | None:
+        """Return a stored layer pair, or None when it was not computed."""
         return self.blocks.get((v, w))

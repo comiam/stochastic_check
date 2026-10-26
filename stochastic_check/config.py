@@ -1,25 +1,17 @@
-"""Experiment configuration dataclasses for stochastic-check."""
+"""Keep the experiment protocol and per-run configuration in dataclasses."""
 
 from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-# ---------------------------------------------------------------------------
-#  Training
-# ---------------------------------------------------------------------------
-
 
 @dataclass
 class TrainingConfig:
-    """Hyperparameters for the training loop.
+    """Training defaults from paper section 7.1.
 
-    Defaults follow the protocol in section 7.1 of the paper:
-    SGD(momentum=0.9), lr=0.1, batch_size=128, weight_decay=5e-4
-    (the standard CIFAR regulariser; its contribution to the layer
-    Hessian is the constant diagonal term :math:`2\\lambda I` and is
-    declared explicitly in the paper to keep the curvature target
-    well-defined), per-step cosine schedule over the full epoch budget,
-    no gradient clipping.
+    SGD uses momentum 0.9, lr 0.1, batch size 128, and weight decay 5e-4.
+    The stated L2 convention adds the constant Hessian term 2*lambda*I.
+    The cosine schedule advances per step; gradient clipping is disabled.
     """
 
     lr: float = 0.1
@@ -27,86 +19,53 @@ class TrainingConfig:
     epochs: int = 30
     momentum: float = 0.9
     weight_decay: float = 5e-4
-    scheduler: str = "cosine"  # "none" | "cosine"
-    grad_clip: float | None = None  # None => disabled (paper default)
 
-    # Steps between trace measurements (0 disables periodic collection).
+    scheduler: str = "cosine"
+    grad_clip: float | None = None
     metric_interval_steps: int = 100
-
-    # Per-run seed and label-noise level.
     seed: int = 42
-    noise_rate: float = 0.0  # symmetric label-noise probability in [0, 1)
+    noise_rate: float = 0.0
 
-    # Checkpoint epochs requested by the runner.  When ``None`` the
-    # runner falls back to the symbolic ``checkpoint_labels`` mapping
-    # (init / mid / final).  A concrete list overrides the labels and
-    # is the recommended path for reproducibility (the paper's plan
-    # uses ``[0, 10, 30]``).
+    # Explicit epochs override the legacy symbolic labels.
     checkpoint_epochs: list[int] | None = None
     checkpoint_labels: list[str] = field(
         default_factory=lambda: ["init", "mid", "final"]
     )
 
 
-# ---------------------------------------------------------------------------
-#  Estimator
-# ---------------------------------------------------------------------------
-
-
 @dataclass
 class EstimatorConfig:
-    """Choice and hyperparameters of the trace estimator used during training.
+    """Configure the periodic training estimator and its Hessian batch.
 
-    The training loop runs a single estimator (typically the cheap
-    single-pass Hutchinson with K=10) at periodic intervals.  The full
-    estimator comparison (Hutch++, K-FAC, ...) is done post-hoc by
-    ``runner_exp_a`` on saved checkpoints.
+    Hutchinson K=10 is used during training. The other estimator choices
+    are compared separately on saved checkpoints.
     """
 
-    name: str = "hutchinson"  # "hutchinson" | "hutch_plus_plus" | "bl_diag" | "kfac"
+    name: str = "hutchinson"
     n_probes: int = 10
-    n_orth_frac: float = 1.0 / 3.0  # Hutch++ only
-
-    # Number of validation samples used for the Hessian batch.
+    n_orth_frac: float = 1.0 / 3.0
     hessian_batch_size: int = 128
-
-
-# ---------------------------------------------------------------------------
-#  Per-run experiment
-# ---------------------------------------------------------------------------
 
 
 @dataclass
 class RunConfig:
-    """A single training run = one ``(arch, dataset, noise, seed)`` cell.
+    """Describe one architecture/dataset/noise/seed cell for serialization."""
 
-    The orchestrator dispatches one such run per task; this dataclass is
-    serialised into the per-run ``final.json`` for full reproducibility.
-    """
-
-    arch: str  # "resnet18" | "vgg11" | "resnet34"
-    dataset: str  # "cifar10" | "cifar100"
+    arch: str
+    dataset: str
     training: TrainingConfig = field(default_factory=TrainingConfig)
     estimator: EstimatorConfig = field(default_factory=EstimatorConfig)
     output_dir: str = "results/exp_b/runs"
 
     @property
     def num_classes(self) -> int:
+        """Return the class count of the selected CIFAR dataset."""
         return {"cifar10": 10, "cifar100": 100}[self.dataset]
-
-
-# ---------------------------------------------------------------------------
-#  Sweep specification (matrix over arch x dataset x noise x seed)
-# ---------------------------------------------------------------------------
 
 
 @dataclass
 class SweepConfig:
-    """A full sweep that expands into one :class:`RunConfig` per cell.
-
-    Used by ``run_all.sh`` and ``main.py sweep`` to materialise the
-    matrix and submit it to ``lab_orchestrator``.
-    """
+    """Describe the ordered product of architectures, datasets, noise, and seeds."""
 
     archs: list[str] = field(default_factory=lambda: ["resnet18", "vgg11", "resnet34"])
     datasets: list[str] = field(default_factory=lambda: ["cifar10", "cifar100"])

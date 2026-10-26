@@ -1,4 +1,4 @@
-"""Task definition and matrix builder."""
+"""Represent scheduled tasks and expand deduplicated experiment matrices."""
 
 from __future__ import annotations
 
@@ -8,25 +8,11 @@ from dataclasses import dataclass, field
 
 @dataclass(order=True)
 class Task:
-    """A single schedulable unit dispatched to one GPU.
+    """Describe one subprocess, ordered by estimated GPU hours/name/seed.
 
-    Parameters
-    ----------
-    weight : float
-        Estimated GPU-hours for this task (used for LPT ordering and
-        load-aware dispatch).
-    name : str
-        Human-readable experiment/regime identifier.
-    seed : int
-        Random seed for this task.
-    cmd : list[str]
-        Full command to execute as a subprocess.  The scheduler sets
-        ``CUDA_VISIBLE_DEVICES`` in the environment; the command itself
-        should NOT include GPU selection flags.
-    depends_on : list[str]
-        Names of tasks that must complete successfully before this task
-        is dispatched.  If any dependency fails, the task is skipped
-        with rc=-2 and counted as a failure.
+    CUDA selection belongs to the worker environment, not cmd. Dependencies
+    name tasks that must succeed; a failed dependency yields a skipped task
+    with return code -2. Command and dependency lists do not affect sorting.
     """
 
     weight: float = field(compare=True)
@@ -37,6 +23,7 @@ class Task:
 
     @property
     def label(self) -> str:
+        """Return the worker/log identifier including the seed."""
         return f"{self.name}[seed={self.seed}]"
 
 
@@ -48,52 +35,31 @@ def build_task_matrix(
     *,
     available_names: list[str] | None = None,
 ) -> list[Task]:
-    """Build an LPT-sorted task list from a ``name * seed`` matrix.
+    """Expand unique name/seed pairs and sort them in descending LPT order.
 
-    Parameters
-    ----------
-    names : list[str]
-        Experiment/regime names to schedule.
-    seeds : list[int]
-        Seed values; one task per ``(name, seed)`` pair.
-    weights : dict[str, float]
-        Estimated GPU-hours per seed for each name.
-    cmd_factory : callable
-        ``(name, seed) -> list[str]`` - builds the subprocess command.
-    available_names : list[str] | None
-        If given, validates *names* against this whitelist.
-
-    Returns
-    -------
-    list[Task]
-        De-duplicated, sorted descending by weight (LPT).
-
-    Raises
-    ------
-    ValueError
-        On unknown names.
+    An optional whitelist rejects unknown names before constructing commands.
+    Missing weights use one GPU-hour, preserving the existing default.
     """
     if available_names is not None:
-        for n in names:
-            if n not in available_names:
-                raise ValueError(f"Unknown name {n!r}. Available: {', '.join(available_names)}")
+        for name in names:
+            if name not in available_names:
+                raise ValueError(
+                    f"Unknown name {name!r}. Available: {', '.join(available_names)}"
+                )
 
     seen: set[tuple[str, int]] = set()
     tasks: list[Task] = []
 
     for name in names:
-        w = weights.get(name, 1.0)
+        weight = weights.get(name, 1.0)
+
         for seed in seeds:
             if (name, seed) in seen:
                 continue
+
             seen.add((name, seed))
             tasks.append(
-                Task(
-                    weight=w,
-                    name=name,
-                    seed=seed,
-                    cmd=cmd_factory(name, seed),
-                )
+                Task(weight=weight, name=name, seed=seed, cmd=cmd_factory(name, seed))
             )
 
     tasks.sort(reverse=True)

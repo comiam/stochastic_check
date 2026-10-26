@@ -1,13 +1,4 @@
-"""Table ``tab:comparison`` -- estimator-by-estimator relative error and cost.
-
-Aggregates the per-checkpoint comparison files under
-``results/exp_a/runs/`` across all ``(arch, dataset, noise, seed)``
-cells and produces a LaTeX table with rows = estimator, columns =
-``rel. error (mean +/- std)``, ``normalised wallclock``.
-
-The normalisation reference is the Hutchinson-K=10 wallclock at each
-checkpoint, so the table reads "X times slower than the cheap default".
-"""
+"""Summarize estimator errors and cost relative to Hutchinson K=10."""
 
 from __future__ import annotations
 
@@ -19,14 +10,7 @@ from ..config import DataPaths
 from ..formatting import fmt_mean_std
 from ..loader import iter_run_comparisons
 
-_ESTIMATORS = [
-    "hutchinson_k5",
-    "hutchinson_k10",
-    "hutch_plus_plus_hvp13",
-    "kfac",
-]
-
-# LaTeX-friendly display names; keep the cost surface explicit.
+_ESTIMATORS = ["hutchinson_k5", "hutchinson_k10", "hutch_plus_plus_hvp13", "kfac"]
 _DISPLAY_NAMES = {
     "hutchinson_k5": r"Hutchinson ($K=5$, $5$ HVP)",
     "hutchinson_k10": r"Hutchinson ($K=10$, $10$ HVP)",
@@ -35,54 +19,67 @@ _DISPLAY_NAMES = {
 }
 
 
-def generate(paths: DataPaths, out_dir: Path) -> Path:
-    rel_errors: dict[str, list[float]] = defaultdict(list)
-    wallclocks: dict[str, list[float]] = defaultdict(list)
-    norm_wallclocks: dict[str, list[float]] = defaultdict(list)
+def _collect_record(record, reference_time, errors, times, relative_times) -> None:
+    """Collect one estimator's available timing and non-NaN layer errors."""
+    wallclock = record.get("wallclock_s")
+    if wallclock is not None:
+        times.append(float(wallclock))
+        if reference_time:
+            relative_times.append(float(wallclock) / float(reference_time))
 
-    for _run_dir, comp in iter_run_comparisons(paths.exp_a_runs_root):
-        for _label, cp in comp.get("checkpoints", {}).items():
-            ests = cp.get("estimators", {})
-            ref_wc = ests.get("hutchinson_k10", {}).get("wallclock_s")
+    for value in record.get("relative_error", {}).values():
+        if value is None or (isinstance(value, float) and math.isnan(value)):
+            continue
+        errors.append(float(value))
+
+
+def _collect_results(runs_root: Path):
+    """Pool checkpoint results in their original run/estimator/layer order."""
+    errors: dict[str, list[float]] = defaultdict(list)
+    times: dict[str, list[float]] = defaultdict(list)
+    relative_times: dict[str, list[float]] = defaultdict(list)
+
+    for _, comparison in iter_run_comparisons(runs_root):
+        for checkpoint in comparison.get("checkpoints", {}).values():
+            estimators = checkpoint.get("estimators", {})
+            reference_time = estimators.get("hutchinson_k10", {}).get("wallclock_s")
+
             for name in _ESTIMATORS:
-                rec = ests.get(name)
-                if rec is None:
+                record = estimators.get(name)
+                if record is None:
                     continue
-                wc = rec.get("wallclock_s")
-                if wc is not None:
-                    wallclocks[name].append(float(wc))
-                    if ref_wc:
-                        norm_wallclocks[name].append(float(wc) / float(ref_wc))
-                rel = rec.get("relative_error", {})
-                for v in rel.values():
-                    if v is None or (isinstance(v, float) and math.isnan(v)):
-                        continue
-                    rel_errors[name].append(float(v))
 
-    lines: list[str] = []
-    lines.append(r"\begin{tabular}{lccc}")
-    lines.append(r"\toprule")
-    lines.append(
-        r"Estimator & Rel.\ error & Wallclock (s) & "
-        r"Wallclock / Hutchinson$_{K=10}$ \\"
-    )
-    lines.append(r"\midrule")
+                _collect_record(
+                    record,
+                    reference_time,
+                    errors[name],
+                    times[name],
+                    relative_times[name],
+                )
+
+    return errors, times, relative_times
+
+
+def generate(paths: DataPaths, out_dir: Path) -> Path:
+    """Write mean errors and raw/normalized timings for each estimator."""
+    errors, times, relative_times = _collect_results(paths.exp_a_runs_root)
+    lines = [
+        r"\begin{tabular}{lccc}",
+        r"\toprule",
+        r"Estimator & Rel.\ error & Wallclock (s) & Wallclock / Hutchinson$_{K=10}$ \\",
+        r"\midrule",
+    ]
     for name in _ESTIMATORS:
-        lines.append(
-            " & ".join(
-                [
-                    _DISPLAY_NAMES.get(name, name.replace("_", r"\_")),
-                    fmt_mean_std(rel_errors[name], digits=4),
-                    fmt_mean_std(wallclocks[name], digits=3),
-                    fmt_mean_std(norm_wallclocks[name], digits=2),
-                ]
-            )
-            + r" \\"
-        )
-    lines.append(r"\bottomrule")
-    lines.append(r"\end{tabular}")
+        cells = [
+            _DISPLAY_NAMES.get(name, name.replace("_", r"\_")),
+            fmt_mean_std(errors[name], digits=4),
+            fmt_mean_std(times[name], digits=3),
+            fmt_mean_std(relative_times[name], digits=2),
+        ]
+        lines.append(" & ".join(cells) + r" \\")
 
-    out_path = out_dir / "tab_comparison.tex"
-    out_path.parent.mkdir(parents=True, exist_ok=True)
-    out_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
-    return out_path
+    lines.extend([r"\bottomrule", r"\end{tabular}"])
+    output = out_dir / "tab_comparison.tex"
+    output.parent.mkdir(parents=True, exist_ok=True)
+    output.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    return output

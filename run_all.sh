@@ -131,7 +131,7 @@ fi
 # concurrently from multiple workers; pre-fetching once in this process
 # avoids losing the occasional cell to a half-written archive.
 ensure_datasets() {
-    python -c \
+    uv run --locked python -c \
 "from stochastic_check.data import ensure_datasets_downloaded; ensure_datasets_downloaded()"
 }
 
@@ -140,7 +140,7 @@ ensure_datasets() {
 run_diagnostic() {
     echo "[diagnostic] single-cell smoke test: ResNet-18 / CIFAR-10 / eta=0.40 / seed=0"
     ensure_datasets
-    python -m main train \
+    uv run --locked python -m main train \
         --arch resnet18 \
         --dataset cifar10 \
         --noise 0.40 \
@@ -149,7 +149,7 @@ run_diagnostic() {
         --checkpoint-epochs 0 1 2 \
         --metric-interval 50 \
         --output-dir results/diagnostic/runs
-    python -m main compare \
+    uv run --locked python -m main compare \
         --arch resnet18 \
         --dataset cifar10 \
         --noise 0.40 \
@@ -158,7 +158,7 @@ run_diagnostic() {
         --output-dir results/diagnostic/comparison \
         --hessian-batch 64 \
         --reference-probes 100
-    python -m main aggregate \
+    uv run --locked python -m main aggregate \
         --kind exp_b \
         --root results/diagnostic/runs \
         --out  results/diagnostic/aggregate.json
@@ -168,7 +168,7 @@ run_diagnostic() {
 run_full_training() {
     echo "[full_run] dispatching full sweep (archs x datasets x noises x seeds=${SEED_LIST[*]})"
     ensure_datasets
-    python -m main sweep \
+    uv run --locked python -m main sweep \
         --archs resnet18 vgg11 resnet34 \
         --datasets cifar10 cifar100 \
         --noises 0.0 0.25 0.40 0.60 \
@@ -179,9 +179,9 @@ run_full_training() {
         --output-root results/exp_b \
         --also-compare \
         "${GPU_ARGS[@]}"
-    python -m main aggregate --kind exp_b \
+    uv run --locked python -m main aggregate --kind exp_b \
         --root results/exp_b/runs --out results/exp_b/aggregate.json
-    python -m main aggregate --kind exp_a \
+    uv run --locked python -m main aggregate --kind exp_a \
         --root results/exp_a/runs --out results/exp_a/aggregate.json
     echo "[full_run] OK"
 }
@@ -189,7 +189,7 @@ run_full_training() {
 run_exp_b_only() {
     echo "[exp_b] training stage only (seeds=${SEED_LIST[*]})"
     ensure_datasets
-    python -m main sweep \
+    uv run --locked python -m main sweep \
         --archs resnet18 vgg11 resnet34 \
         --datasets cifar10 cifar100 \
         --noises 0.0 0.25 0.40 0.60 \
@@ -200,7 +200,7 @@ run_exp_b_only() {
         --workers-per-gpu "$WORKERS" \
         --output-root results/exp_b \
         "${GPU_ARGS[@]}"
-    python -m main aggregate --kind exp_b \
+    uv run --locked python -m main aggregate --kind exp_b \
         --root results/exp_b/runs --out results/exp_b/aggregate.json
     echo "[exp_b] OK"
 }
@@ -208,7 +208,7 @@ run_exp_b_only() {
 run_exp_a_only() {
     echo "[exp_a] re-running estimator-comparison stage only (seeds=${SEED_LIST[*]})"
     ensure_datasets
-    python -m main sweep \
+    uv run --locked python -m main sweep \
         --archs resnet18 vgg11 resnet34 \
         --datasets cifar10 cifar100 \
         --noises 0.0 0.25 0.40 0.60 \
@@ -219,7 +219,7 @@ run_exp_a_only() {
         --workers-per-gpu "$WORKERS" \
         --output-root results/exp_b \
         "${GPU_ARGS[@]}"
-    python -m main aggregate --kind exp_a \
+    uv run --locked python -m main aggregate --kind exp_a \
         --root results/exp_a/runs --out results/exp_a/aggregate.json
     echo "[exp_a] OK"
 }
@@ -240,7 +240,7 @@ run_phase1_extension() {
         done
     done
     ensure_datasets
-    python -m main sweep \
+    uv run --locked python -m main sweep \
         --archs resnet18 vgg11 resnet34 \
         --datasets cifar10 cifar100 \
         --noises 0.0 \
@@ -251,14 +251,15 @@ run_phase1_extension() {
         --workers-per-gpu "$WORKERS" \
         --output-root results/exp_b \
         "${GPU_ARGS[@]}"
-    python -m main aggregate --kind exp_b \
+    uv run --locked python -m main aggregate --kind exp_b \
         --root results/exp_b/runs --out results/exp_b/aggregate.json
     echo "[phase1_extension] OK"
 }
 
 run_tables() {
     echo "[tables] regenerating paper artefacts"
-    python -m paper_data.main --all
+    uv run --locked python -m paper_data.main \
+        --label tab:alerts --label tab:baselines --label tab:overhead
     echo "[tables] OK"
 }
 

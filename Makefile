@@ -1,70 +1,60 @@
-.PHONY: help install lint format typecheck test check clean \
-        diagnostic full exp_a exp_b tables
+.PHONY: help install lint format style typecheck test check clean \
+        diagnostic full exp_a exp_b phase1_extension tables data-check paper-check
 
-GPU ?=
+.DEFAULT_GOAL := help
+UV ?= uv
+PYTHON = $(UV) run --locked python
+SOURCES = main.py hessian stochastic_check lab_orchestrator paper_data scripts_adhoc tests
+RUN = GPUS="$(GPUS)" WORKERS="$(WORKERS)" SEEDS="$(SEEDS)" bash run_all.sh
 
-help: ## Show this help
+help: ## Show available targets
 	@grep -E '^[a-zA-Z0-9_-]+:.*##' $(MAKEFILE_LIST) | \
-		awk 'BEGIN {FS = ":.*##"}; {printf "  \033[36m%-18s\033[0m %s\n", $$1, $$2}'
+		awk 'BEGIN {FS = ":.*##"}; {printf "  %-18s %s\n", $$1, $$2}'
 
-# ---------------------------------------------------------------------------
-# Dev
-# ---------------------------------------------------------------------------
+install: ## Install locked dependencies with Python 3.12
+	$(UV) sync --locked --python 3.12
 
-install: ## Install project + dev deps via uv
-	uv sync
+lint: ## Check Python lint, documentation, formatting, and shell syntax
+	$(UV) run --locked ruff check $(SOURCES)
+	$(UV) run --locked ruff format --check $(SOURCES)
+	bash -n run_all.sh
 
-lint: ## Run ruff + flake8
-	uv run ruff check .
-	uv run flake8 . --exclude=.venv
+format: ## Apply safe Ruff fixes and format the maintained Python files
+	$(UV) run --locked ruff check --fix $(SOURCES)
+	$(UV) run --locked ruff format $(SOURCES)
 
-format: ## Format with black + ruff --fix
-	uv run black .
-	uv run ruff check --fix .
+style: lint ## Check the source style
 
-typecheck: ## Run mypy
-	uv run mypy . --exclude '.venv'
+typecheck: ## Check types without changing numerical expressions
+	$(PYTHON) -m mypy $(SOURCES)
 
-test: ## Run pytest
-	uv run pytest hessian/tests/ stochastic_check/tests/ -v
+test: ## Run the CPU tests, including paper regressions
+	OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 $(PYTHON) -m pytest -q
 
-check: lint typecheck test ## Run lint + typecheck + test
+data-check: ## Verify all bundled result checksums
+	cd paper_data/artifacts && sha256sum --quiet -c SHA256SUMS
 
-# ---------------------------------------------------------------------------
-# Experiments
-#
-# Customise via environment variables (forwarded to run_all.sh):
-#   GPUS="0,1,2,3"   subset of GPU ids (default: all visible)
-#   WORKERS=2        concurrent tasks per GPU (default: 1)
-#   SEEDS="0 1 2"    subset of the seed axis (default: 0..9)
-#
-# Examples:
-#   make full   GPUS=0,1,2,3 WORKERS=2
-#   make exp_b  GPUS=2,3     WORKERS=2
-#   make exp_a  GPUS=0,1,2,3 WORKERS=2 SEEDS="0 1 2"
-# ---------------------------------------------------------------------------
+check: lint typecheck test data-check ## Run all development and reproduction checks
 
-RUN := GPUS="$(GPUS)" WORKERS="$(WORKERS)" SEEDS="$(SEEDS)" bash run_all.sh
+tables: ## Rebuild the three article tables without checkpoints or a GPU
+	$(PYTHON) -m paper_data.main --label tab:alerts --label tab:baselines --label tab:overhead
 
-diagnostic: ## Smoke run: 1 seed, 1 arch, 1 noise level, short training
+diagnostic: ## Run the short training and comparison smoke test
 	$(RUN) diagnostic_run
 
-full: ## Full Springer sweep (3 archs x 2 datasets x 4 noise x 10 seeds)
+full: ## Run the original 240-cell sweep
 	$(RUN) full_run
 
-exp_a: ## Only estimator comparison (post-hoc on existing checkpoints)
+exp_a: ## Compare estimators on existing checkpoints
 	$(RUN) exp_a
 
-exp_b: ## Only training sweep (no estimator comparison)
+exp_b: ## Run only the training sweep
 	$(RUN) exp_b
 
-tables: ## Generate LaTeX tables from results/
-	uv run python -m paper_data.main
+phase1_extension: ## Add the 60 clean runs needed for the paper's full ensemble
+	$(RUN) phase1_extension
 
-# ---------------------------------------------------------------------------
-
-clean: ## Remove caches
-	find . -type d -name __pycache__   -exec rm -rf {} + 2>/dev/null || true
-	find . -type d -name .mypy_cache   -exec rm -rf {} + 2>/dev/null || true
-	find . -type d -name .pytest_cache -exec rm -rf {} + 2>/dev/null || true
-	find . -type d -name .ruff_cache   -exec rm -rf {} + 2>/dev/null || true
+clean: ## Remove generated tables and caches, never source data or checkpoints
+	rm -rf build/paper_tables .pytest_cache .ruff_cache .mypy_cache
+	find hessian stochastic_check lab_orchestrator paper_data scripts_adhoc tests \
+		-type d -name __pycache__ -prune -exec rm -rf {} +

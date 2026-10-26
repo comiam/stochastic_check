@@ -32,6 +32,7 @@ def detect_gpus() -> list[int]:
     """
     if _torch is None:
         return []
+
     try:
         count = _torch.cuda.device_count()
     except Exception:

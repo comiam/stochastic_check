@@ -49,6 +49,7 @@ class ExactGNDecomposition:
         model: SegmentedModel,
         loss_fn: Callable[[Tensor, Tensor], Tensor],
     ) -> None:
+        """Configure the segmented model, requiring a mean-reduced loss."""
         _assert_mean_reduction(loss_fn)
         self._model = model
         self._loss_fn = loss_fn
@@ -147,6 +148,7 @@ class ExactGNDecomposition:
         for i in range(idx_v + 1, idx_w + 1):
             h = segments[i](h)
         f_w = h
+
         for i in range(idx_w + 1, len(segments)):
             h = segments[i](h)
         logits = h  # (B, d_out)
@@ -173,7 +175,7 @@ class ExactGNDecomposition:
         d_out: int,
         d_f: int,
     ) -> Tensor:
-        """d logits/d f -> (B, d_out, d_f) via d_out backward passes."""
+        """D logits/d f -> (B, d_out, d_f) via d_out backward passes."""
         jac = torch.zeros(B, d_out, d_f, device=f.device)
         for k in range(d_out):
             grad_k = torch.autograd.grad(
@@ -198,10 +200,12 @@ class ExactGNDecomposition:
         p = F.softmax(logits, dim=-1)  # (B, d_out)
         # L'' @ J_w: (B, d_out, d_w)
         # (diag(p) - pp^T) @ J_w = p.unsqueeze(-1) * J_w - p @ (p^T @ J_w)
+
         pJ_w = p.unsqueeze(-1) * jac_w  # (B, d_out, d_w)
         pTJ_w = torch.bmm(p.unsqueeze(1), jac_w)  # (B, 1, d_w)
         L2_Jw = pJ_w - p.unsqueeze(-1) * pTJ_w  # (B, d_out, d_w)
         # J_v^T @ L'' @ J_w -> (B, d_v, d_w)
+
         gn_per_sample = torch.bmm(jac_v.transpose(1, 2), L2_Jw)
         # 1/B normalization: gn_per_sample.sum(0) = sum_b J_v^T L'' J_w,
         # loss = (1/B) sum L_b => H_avg = (1/B) sum H_b => GN_avg = (1/B) sum GN_b.
@@ -228,6 +232,7 @@ class StochasticGNGapEstimator:
         loss_fn: Callable[[Tensor, Tensor], Tensor],
         n_probes: int = 30,
     ) -> None:
+        """Configure the segmented model, requiring a mean-reduced loss."""
         _assert_mean_reduction(loss_fn)
         self._model = model
         self._loss_fn = loss_fn
@@ -282,31 +287,9 @@ class StochasticGNGapEstimator:
 
         sq_full, sq_gn, sq_tensor = 0.0, 0.0, 0.0
         for _ in range(self._n_probes):
-            # Shared probe: same z for all samples (as in StochasticHessianEstimator)
-            z_shared = torch.randint(0, 2, (d_w,), device=device).float() * 2 - 1
-            # z_flat (B, d_w) - for bmm with jac_w; z_shaped (B, *spatial) - for dot with grad_fw
-            z_flat = z_shared.unsqueeze(0).expand(B, -1)
-            z_shaped = z_shared.reshape(1, *f_w.shape[1:]).expand_as(f_w)
-
-            # 1. Full HVP: H^f_{v,w} z
-            dot = (grad_fw * z_shaped).sum()
-            hvp_full = torch.autograd.grad(dot, f_v, retain_graph=True)[0]
-            # H_avg z = sum over batch (each hvp_full[b] = (1/B) * H_b z)
-            Hz_full = hvp_full.sum(0)
-
-            # 2. GN-HVP: J_v^T L'' (J_w z)
-            gn_hvp = self._gn_hvp(
-                logits,
-                f_v,
-                jac_w,
-                p,
-                z_flat,
-                B,
+            Hz_full, Hz_gn, Hz_tensor = self._probe_products(
+                f_v, f_w, grad_fw, logits, jac_w, p, B, d_w, device
             )
-            Hz_gn = gn_hvp.sum(0)
-
-            # 3. Tensor HVP
-            Hz_tensor = Hz_full - Hz_gn
 
             sq_full += (Hz_full**2).sum().item()
             sq_gn += (Hz_gn**2).sum().item()
@@ -327,6 +310,22 @@ class StochasticGNGapEstimator:
     # Internals
     # ------------------------------------------------------------------
 
+    def _probe_products(self, f_v, f_w, grad_fw, logits, jac_w, p, B, d_w, device):
+        """Apply one shared probe to the full, GN, and tensor Hessian components."""
+        z_shared = torch.randint(0, 2, (d_w,), device=device).float() * 2 - 1
+        z_flat = z_shared.unsqueeze(0).expand(B, -1)
+        z_shaped = z_shared.reshape(1, *f_w.shape[1:]).expand_as(f_w)
+
+        dot = (grad_fw * z_shaped).sum()
+        hvp_full = torch.autograd.grad(dot, f_v, retain_graph=True)[0]
+        # Each batch row includes 1/B from the mean-reduced loss.
+        full = hvp_full.sum(0)
+
+        gn_hvp = self._gn_hvp(logits, f_v, jac_w, p, z_flat, B)
+        gn = gn_hvp.sum(0)
+        tensor = full - gn
+        return full, gn, tensor
+
     @staticmethod
     def _batch_jacobian_retained(
         logits: Tensor,
@@ -335,7 +334,7 @@ class StochasticGNGapEstimator:
         d_out: int,
         d_f: int,
     ) -> Tensor:
-        """d logits/d f -> (B, d_out, d_f), retain_graph=True."""
+        """D logits/d f -> (B, d_out, d_f), retain_graph=True."""
         jac = torch.zeros(B, d_out, d_f, device=f.device)
         for k in range(d_out):
             grad_k = torch.autograd.grad(

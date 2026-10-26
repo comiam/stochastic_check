@@ -1,14 +1,8 @@
-"""Table ``tab:cohens-d`` -- effect size of label noise on layer-wise trace.
+"""Compare clean/noisy per-layer trace means over a closed epoch window.
 
-For each (arch, dataset, layer) cell we read the per-step trace
-trajectory of every seed, average :math:`\\hat T_\\ell` over a fixed
-**epoch window** ``[epoch_lo, epoch_hi]`` (closed interval, default
-``[10, 20]``, matching section 7.2 of the paper), and compute Cohen's
-d between the clean baseline (``noise = 0``) and each non-zero noise
-level.  Bootstrap 95% CIs are obtained over 10 000 resamples.
-
-The output table has columns = ``arch / dataset / layer``, one
-sub-column per non-zero noise level, cells = ``d [lo, hi]``.
+The default [10,20] window follows the paper. Each seed contributes one
+mean per layer; Cohen's d and 10000 independent bootstrap resamples then
+compare conditions without treating snapshots as independent runs.
 """
 
 from __future__ import annotations
@@ -22,37 +16,104 @@ from ..config import DataPaths
 from ..formatting import fmt_ci
 from ..loader import iter_run_finals, load_jsonl
 
-# Default averaging window (inclusive in epoch index), aligned with
-# section 7.2 of the paper.  Kept module-level so the value is visible
-# in a single place; can be overridden by callers via :func:`generate`.
 DEFAULT_EPOCH_WINDOW: tuple[int, int] = (10, 20)
 
 
 def _windowed_trace_per_layer(
     run_dir: Path, window: tuple[int, int]
 ) -> dict[str, float]:
-    """Average the per-step trace over a closed epoch window.
-
-    Reads ``steps.jsonl`` and, for each layer, averages every record
-    whose ``epoch`` field lies in ``[window[0], window[1]]``.  Layers
-    whose trace is non-finite at every in-window step are dropped.
-    Missing file or empty window -> empty dict.
-    """
-    jsonl = run_dir / "steps.jsonl"
-    if not jsonl.exists():
+    """Average recorded values per layer, skipping missing files and NaN."""
+    stream = run_dir / "steps.jsonl"
+    if not stream.exists():
         return {}
-    lo, hi = window
+
+    low, high = window
     sums: dict[str, float] = defaultdict(float)
     counts: dict[str, int] = defaultdict(int)
-    for rec in load_jsonl(jsonl):
-        epoch = rec.get("epoch")
-        if epoch is None or not (lo <= int(epoch) <= hi):
+
+    for record in load_jsonl(stream):
+        epoch = record.get("epoch")
+        if epoch is None or not (low <= int(epoch) <= high):
             continue
-        for k, v in (rec.get("trace") or {}).items():
-            if isinstance(v, (int, float)) and not math.isnan(float(v)):
-                sums[k] += float(v)
-                counts[k] += 1
-    return {k: sums[k] / counts[k] for k in sums if counts[k] > 0}
+
+        for name, value in (record.get("trace") or {}).items():
+            if isinstance(value, (int, float)) and not math.isnan(float(value)):
+                sums[name] += float(value)
+                counts[name] += 1
+
+    return {name: sums[name] / counts[name] for name in sums if counts[name] > 0}
+
+
+def _collect_buckets(runs_root: Path, window: tuple[int, int]):
+    """Group seed means by architecture, dataset, noise, and layer."""
+    buckets: dict[tuple[str, str, float, str], list[float]] = defaultdict(list)
+
+    for run_dir, final in iter_run_finals(runs_root):
+        config = final.get("config", {})
+        arch = config.get("arch")
+        dataset = config.get("dataset")
+        noise = config.get("training", {}).get("noise_rate")
+
+        if None in (arch, dataset, noise):
+            continue
+
+        for name, value in _windowed_trace_per_layer(run_dir, window).items():
+            buckets[(arch, dataset, float(noise), name)].append(value)
+
+    return buckets
+
+
+def _effect_rows(buckets):
+    """Compare each noisy condition with its matching clean-seed means."""
+    from stochastic_check.analysis import bootstrap_cohens_d
+
+    rows: list[dict[str, Any]] = []
+    keys = {(arch, dataset, layer) for arch, dataset, _, layer in buckets}
+    noises = sorted({noise for _, _, noise, _ in buckets if noise > 0.0})
+
+    for arch, dataset, layer in sorted(keys):
+        clean = buckets.get((arch, dataset, 0.0, layer), [])
+        if len(clean) < 2:
+            continue
+
+        row: dict[str, Any] = {"arch": arch, "dataset": dataset, "layer": layer}
+
+        for noise in noises:
+            noisy = buckets.get((arch, dataset, noise, layer), [])
+
+            if len(noisy) < 2:
+                row[f"eta_{noise}"] = (math.nan, math.nan, math.nan)
+                continue
+
+            effect = bootstrap_cohens_d(clean, noisy, n_resamples=10_000, seed=0)
+            row[f"eta_{noise}"] = (effect.d, effect.ci_low, effect.ci_high)
+
+        rows.append(row)
+
+    return rows, noises
+
+
+def _render_rows(rows, noises) -> list[str]:
+    """Render effect sizes with the original column order and precision."""
+    columns = "lll" + "c" * len(noises)
+    header = ["Arch", "Dataset", "Layer"] + [rf"$\eta = {noise:g}$" for noise in noises]
+    lines = [
+        rf"\begin{{tabular}}{{{columns}}}",
+        r"\toprule",
+        " & ".join(header) + r" \\",
+        r"\midrule",
+    ]
+
+    for row in rows:
+        cells = [row[key].replace("_", r"\_") for key in ("arch", "dataset", "layer")]
+
+        for noise in noises:
+            value, low, high = row[f"eta_{noise}"]
+            cells.append(fmt_ci(value, low, high, digits=2))
+        lines.append(" & ".join(cells) + r" \\")
+
+    lines.extend([r"\bottomrule", r"\end{tabular}"])
+    return lines
 
 
 def generate(
@@ -60,66 +121,12 @@ def generate(
     out_dir: Path,
     epoch_window: tuple[int, int] = DEFAULT_EPOCH_WINDOW,
 ) -> Path:
-    # Index runs by (arch, dataset, noise, layer) -> list of values across seeds.
-    buckets: dict[tuple[str, str, float, str], list[float]] = defaultdict(list)
-    for run_dir, final in iter_run_finals(paths.exp_b_runs_root):
-        cfg = final.get("config", {})
-        arch = cfg.get("arch")
-        dataset = cfg.get("dataset")
-        noise = cfg.get("training", {}).get("noise_rate")
-        if None in (arch, dataset, noise):
-            continue
-        traces = _windowed_trace_per_layer(run_dir, epoch_window)
-        for layer_name, value in traces.items():
-            buckets[(arch, dataset, float(noise), layer_name)].append(value)
+    """Write windowed layer effects without changing the bootstrap settings."""
+    buckets = _collect_buckets(paths.exp_b_runs_root, epoch_window)
+    rows, noises = _effect_rows(buckets)
+    lines = _render_rows(rows, noises)
 
-    # Lazy import: heavy stats only when at least one bucket exists.
-    from stochastic_check.analysis import bootstrap_cohens_d  # noqa: WPS433
-
-    # Per (arch, dataset, layer) and per noise>0, compute d vs noise=0.
-    rows: list[dict[str, Any]] = []
-    keys = {(a, d, l) for (a, d, _n, l) in buckets}
-    noises_nonzero = sorted({n for (_a, _d, n, _l) in buckets if n > 0.0})
-
-    for arch, dataset, layer in sorted(keys):
-        clean = buckets.get((arch, dataset, 0.0, layer), [])
-        if len(clean) < 2:
-            continue
-        row: dict[str, Any] = {"arch": arch, "dataset": dataset, "layer": layer}
-        for eta in noises_nonzero:
-            noisy = buckets.get((arch, dataset, eta, layer), [])
-            if len(noisy) < 2:
-                row[f"eta_{eta}"] = (math.nan, math.nan, math.nan)
-                continue
-            es = bootstrap_cohens_d(clean, noisy, n_resamples=10_000, seed=0)
-            row[f"eta_{eta}"] = (es.d, es.ci_low, es.ci_high)
-        rows.append(row)
-
-    # ---- LaTeX rendering ----
-    lines: list[str] = []
-    n_eta = len(noises_nonzero)
-    cols = "lll" + "c" * n_eta
-    lines.append(rf"\begin{{tabular}}{{{cols}}}")
-    lines.append(r"\toprule")
-    header = ["Arch", "Dataset", "Layer"] + [
-        rf"$\eta = {eta:g}$" for eta in noises_nonzero
-    ]
-    lines.append(" & ".join(header) + r" \\")
-    lines.append(r"\midrule")
-    for row in rows:
-        cells = [
-            row["arch"].replace("_", r"\_"),
-            row["dataset"].replace("_", r"\_"),
-            row["layer"].replace("_", r"\_"),
-        ]
-        for eta in noises_nonzero:
-            d, lo, hi = row[f"eta_{eta}"]
-            cells.append(fmt_ci(d, lo, hi, digits=2))
-        lines.append(" & ".join(cells) + r" \\")
-    lines.append(r"\bottomrule")
-    lines.append(r"\end{tabular}")
-
-    out_path = out_dir / "tab_cohens_d.tex"
-    out_path.parent.mkdir(parents=True, exist_ok=True)
-    out_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
-    return out_path
+    output = out_dir / "tab_cohens_d.tex"
+    output.parent.mkdir(parents=True, exist_ok=True)
+    output.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    return output

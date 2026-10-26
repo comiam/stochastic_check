@@ -1,0 +1,3906 @@
+{
+  "n_runs": 300,
+  "root": "results/exp_b_rerun/runs",
+  "runs": [
+    {
+      "run_dir": "arch=resnet18_dataset=cifar100_noise=0.00_seed=0",
+      "arch": "resnet18",
+      "dataset": "cifar100",
+      "noise_rate": 0.0,
+      "seed": 0,
+      "final_eval": {
+        "val_loss": 0.9767141841888428,
+        "val_acc": 0.7429
+      },
+      "wallclock_s": 2067.509028408909,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar100_noise=0.00_seed=1",
+      "arch": "resnet18",
+      "dataset": "cifar100",
+      "noise_rate": 0.0,
+      "seed": 1,
+      "final_eval": {
+        "val_loss": 0.9922447731018066,
+        "val_acc": 0.7407
+      },
+      "wallclock_s": 2069.0979665990453,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar100_noise=0.00_seed=10",
+      "arch": "resnet18",
+      "dataset": "cifar100",
+      "noise_rate": 0.0,
+      "seed": 10,
+      "final_eval": {
+        "val_loss": 0.9751828199386596,
+        "val_acc": 0.7446
+      },
+      "wallclock_s": 3434.4927611169405,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar100_noise=0.00_seed=11",
+      "arch": "resnet18",
+      "dataset": "cifar100",
+      "noise_rate": 0.0,
+      "seed": 11,
+      "final_eval": {
+        "val_loss": 0.9851492036819458,
+        "val_acc": 0.7424
+      },
+      "wallclock_s": 3390.8623806100804,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar100_noise=0.00_seed=12",
+      "arch": "resnet18",
+      "dataset": "cifar100",
+      "noise_rate": 0.0,
+      "seed": 12,
+      "final_eval": {
+        "val_loss": 0.9920653123855591,
+        "val_acc": 0.7448
+      },
+      "wallclock_s": 2013.9973494079895,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar100_noise=0.00_seed=13",
+      "arch": "resnet18",
+      "dataset": "cifar100",
+      "noise_rate": 0.0,
+      "seed": 13,
+      "final_eval": {
+        "val_loss": 0.9993511238098145,
+        "val_acc": 0.7419
+      },
+      "wallclock_s": 2014.088718056213,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar100_noise=0.00_seed=14",
+      "arch": "resnet18",
+      "dataset": "cifar100",
+      "noise_rate": 0.0,
+      "seed": 14,
+      "final_eval": {
+        "val_loss": 0.9818731311798096,
+        "val_acc": 0.7469
+      },
+      "wallclock_s": 1992.7282359441742,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar100_noise=0.00_seed=15",
+      "arch": "resnet18",
+      "dataset": "cifar100",
+      "noise_rate": 0.0,
+      "seed": 15,
+      "final_eval": {
+        "val_loss": 1.000764535331726,
+        "val_acc": 0.7471
+      },
+      "wallclock_s": 1991.2322880758438,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar100_noise=0.00_seed=16",
+      "arch": "resnet18",
+      "dataset": "cifar100",
+      "noise_rate": 0.0,
+      "seed": 16,
+      "final_eval": {
+        "val_loss": 0.991520005607605,
+        "val_acc": 0.7398
+      },
+      "wallclock_s": 2059.9993570188526,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar100_noise=0.00_seed=17",
+      "arch": "resnet18",
+      "dataset": "cifar100",
+      "noise_rate": 0.0,
+      "seed": 17,
+      "final_eval": {
+        "val_loss": 1.0018380342483522,
+        "val_acc": 0.7392
+      },
+      "wallclock_s": 2060.1119461050257,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar100_noise=0.00_seed=18",
+      "arch": "resnet18",
+      "dataset": "cifar100",
+      "noise_rate": 0.0,
+      "seed": 18,
+      "final_eval": {
+        "val_loss": 0.9791012128829956,
+        "val_acc": 0.7446
+      },
+      "wallclock_s": 1970.735430978937,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar100_noise=0.00_seed=19",
+      "arch": "resnet18",
+      "dataset": "cifar100",
+      "noise_rate": 0.0,
+      "seed": 19,
+      "final_eval": {
+        "val_loss": 0.9859481950759887,
+        "val_acc": 0.7454
+      },
+      "wallclock_s": 1970.1093324241228,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar100_noise=0.00_seed=2",
+      "arch": "resnet18",
+      "dataset": "cifar100",
+      "noise_rate": 0.0,
+      "seed": 2,
+      "final_eval": {
+        "val_loss": 0.9991077968597412,
+        "val_acc": 0.7385
+      },
+      "wallclock_s": 1995.806827218039,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar100_noise=0.00_seed=3",
+      "arch": "resnet18",
+      "dataset": "cifar100",
+      "noise_rate": 0.0,
+      "seed": 3,
+      "final_eval": {
+        "val_loss": 0.9914262714385986,
+        "val_acc": 0.7447
+      },
+      "wallclock_s": 1995.764719058061,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar100_noise=0.00_seed=4",
+      "arch": "resnet18",
+      "dataset": "cifar100",
+      "noise_rate": 0.0,
+      "seed": 4,
+      "final_eval": {
+        "val_loss": 0.9707233535766602,
+        "val_acc": 0.7469
+      },
+      "wallclock_s": 2003.9788578900043,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar100_noise=0.00_seed=5",
+      "arch": "resnet18",
+      "dataset": "cifar100",
+      "noise_rate": 0.0,
+      "seed": 5,
+      "final_eval": {
+        "val_loss": 0.9707631103515625,
+        "val_acc": 0.7482
+      },
+      "wallclock_s": 2001.0564541381318,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar100_noise=0.00_seed=6",
+      "arch": "resnet18",
+      "dataset": "cifar100",
+      "noise_rate": 0.0,
+      "seed": 6,
+      "final_eval": {
+        "val_loss": 1.0115467321395875,
+        "val_acc": 0.7441
+      },
+      "wallclock_s": 2067.4778028097935,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar100_noise=0.00_seed=7",
+      "arch": "resnet18",
+      "dataset": "cifar100",
+      "noise_rate": 0.0,
+      "seed": 7,
+      "final_eval": {
+        "val_loss": 0.9845594356536865,
+        "val_acc": 0.7441
+      },
+      "wallclock_s": 2064.6088961351197,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar100_noise=0.00_seed=8",
+      "arch": "resnet18",
+      "dataset": "cifar100",
+      "noise_rate": 0.0,
+      "seed": 8,
+      "final_eval": {
+        "val_loss": 0.9715728872299194,
+        "val_acc": 0.7451
+      },
+      "wallclock_s": 2018.4924488959368,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar100_noise=0.00_seed=9",
+      "arch": "resnet18",
+      "dataset": "cifar100",
+      "noise_rate": 0.0,
+      "seed": 9,
+      "final_eval": {
+        "val_loss": 1.0015754829406738,
+        "val_acc": 0.7428
+      },
+      "wallclock_s": 2018.4664336941205,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar100_noise=0.25_seed=0",
+      "arch": "resnet18",
+      "dataset": "cifar100",
+      "noise_rate": 0.25,
+      "seed": 0,
+      "final_eval": {
+        "val_loss": 1.737364033126831,
+        "val_acc": 0.5991
+      },
+      "wallclock_s": 1999.7690503380727,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar100_noise=0.25_seed=1",
+      "arch": "resnet18",
+      "dataset": "cifar100",
+      "noise_rate": 0.25,
+      "seed": 1,
+      "final_eval": {
+        "val_loss": 1.7264805797576905,
+        "val_acc": 0.603
+      },
+      "wallclock_s": 1998.8702437242027,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar100_noise=0.25_seed=2",
+      "arch": "resnet18",
+      "dataset": "cifar100",
+      "noise_rate": 0.25,
+      "seed": 2,
+      "final_eval": {
+        "val_loss": 1.7081515739440918,
+        "val_acc": 0.6083
+      },
+      "wallclock_s": 2072.1171951470897,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar100_noise=0.25_seed=3",
+      "arch": "resnet18",
+      "dataset": "cifar100",
+      "noise_rate": 0.25,
+      "seed": 3,
+      "final_eval": {
+        "val_loss": 1.690644165802002,
+        "val_acc": 0.6078
+      },
+      "wallclock_s": 2070.859987871954,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar100_noise=0.25_seed=4",
+      "arch": "resnet18",
+      "dataset": "cifar100",
+      "noise_rate": 0.25,
+      "seed": 4,
+      "final_eval": {
+        "val_loss": 1.765871556854248,
+        "val_acc": 0.6015
+      },
+      "wallclock_s": 1984.013409737032,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar100_noise=0.25_seed=5",
+      "arch": "resnet18",
+      "dataset": "cifar100",
+      "noise_rate": 0.25,
+      "seed": 5,
+      "final_eval": {
+        "val_loss": 1.6839280212402343,
+        "val_acc": 0.6124
+      },
+      "wallclock_s": 1984.879929031944,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar100_noise=0.25_seed=6",
+      "arch": "resnet18",
+      "dataset": "cifar100",
+      "noise_rate": 0.25,
+      "seed": 6,
+      "final_eval": {
+        "val_loss": 1.711878497505188,
+        "val_acc": 0.6109
+      },
+      "wallclock_s": 2053.3303254651837,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar100_noise=0.25_seed=7",
+      "arch": "resnet18",
+      "dataset": "cifar100",
+      "noise_rate": 0.25,
+      "seed": 7,
+      "final_eval": {
+        "val_loss": 1.6962178554534912,
+        "val_acc": 0.6111
+      },
+      "wallclock_s": 2053.581245846115,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar100_noise=0.25_seed=8",
+      "arch": "resnet18",
+      "dataset": "cifar100",
+      "noise_rate": 0.25,
+      "seed": 8,
+      "final_eval": {
+        "val_loss": 1.6883490037918092,
+        "val_acc": 0.6162
+      },
+      "wallclock_s": 2110.7394475089386,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar100_noise=0.25_seed=9",
+      "arch": "resnet18",
+      "dataset": "cifar100",
+      "noise_rate": 0.25,
+      "seed": 9,
+      "final_eval": {
+        "val_loss": 1.7305371770858764,
+        "val_acc": 0.5995
+      },
+      "wallclock_s": 2108.7286428119987,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar100_noise=0.40_seed=0",
+      "arch": "resnet18",
+      "dataset": "cifar100",
+      "noise_rate": 0.4,
+      "seed": 0,
+      "final_eval": {
+        "val_loss": 2.0900777393341063,
+        "val_acc": 0.5358
+      },
+      "wallclock_s": 2014.2693354159128,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar100_noise=0.40_seed=1",
+      "arch": "resnet18",
+      "dataset": "cifar100",
+      "noise_rate": 0.4,
+      "seed": 1,
+      "final_eval": {
+        "val_loss": 2.0976395488739015,
+        "val_acc": 0.5356
+      },
+      "wallclock_s": 2014.3197487678844,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar100_noise=0.40_seed=2",
+      "arch": "resnet18",
+      "dataset": "cifar100",
+      "noise_rate": 0.4,
+      "seed": 2,
+      "final_eval": {
+        "val_loss": 2.065012030792236,
+        "val_acc": 0.5443
+      },
+      "wallclock_s": 1999.21295873099,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar100_noise=0.40_seed=3",
+      "arch": "resnet18",
+      "dataset": "cifar100",
+      "noise_rate": 0.4,
+      "seed": 3,
+      "final_eval": {
+        "val_loss": 2.0617070587158204,
+        "val_acc": 0.5453
+      },
+      "wallclock_s": 1996.5929200020619,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar100_noise=0.40_seed=4",
+      "arch": "resnet18",
+      "dataset": "cifar100",
+      "noise_rate": 0.4,
+      "seed": 4,
+      "final_eval": {
+        "val_loss": 2.0742682413101194,
+        "val_acc": 0.5408
+      },
+      "wallclock_s": 2072.410207722103,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar100_noise=0.40_seed=5",
+      "arch": "resnet18",
+      "dataset": "cifar100",
+      "noise_rate": 0.4,
+      "seed": 5,
+      "final_eval": {
+        "val_loss": 2.0713146324157714,
+        "val_acc": 0.5457
+      },
+      "wallclock_s": 2070.639851571992,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar100_noise=0.40_seed=6",
+      "arch": "resnet18",
+      "dataset": "cifar100",
+      "noise_rate": 0.4,
+      "seed": 6,
+      "final_eval": {
+        "val_loss": 2.0652601791381837,
+        "val_acc": 0.5392
+      },
+      "wallclock_s": 1972.7073504680302,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar100_noise=0.40_seed=7",
+      "arch": "resnet18",
+      "dataset": "cifar100",
+      "noise_rate": 0.4,
+      "seed": 7,
+      "final_eval": {
+        "val_loss": 2.0461049446105957,
+        "val_acc": 0.5492
+      },
+      "wallclock_s": 1963.8733951530885,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar100_noise=0.40_seed=8",
+      "arch": "resnet18",
+      "dataset": "cifar100",
+      "noise_rate": 0.4,
+      "seed": 8,
+      "final_eval": {
+        "val_loss": 2.061354461669922,
+        "val_acc": 0.5465
+      },
+      "wallclock_s": 2000.2417538468726,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar100_noise=0.40_seed=9",
+      "arch": "resnet18",
+      "dataset": "cifar100",
+      "noise_rate": 0.4,
+      "seed": 9,
+      "final_eval": {
+        "val_loss": 2.071071425628662,
+        "val_acc": 0.541
+      },
+      "wallclock_s": 1993.3382046490442,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar100_noise=0.60_seed=0",
+      "arch": "resnet18",
+      "dataset": "cifar100",
+      "noise_rate": 0.6,
+      "seed": 0,
+      "final_eval": {
+        "val_loss": 2.6161089870452883,
+        "val_acc": 0.4471
+      },
+      "wallclock_s": 2076.81416770909,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar100_noise=0.60_seed=1",
+      "arch": "resnet18",
+      "dataset": "cifar100",
+      "noise_rate": 0.6,
+      "seed": 1,
+      "final_eval": {
+        "val_loss": 2.5759748863220215,
+        "val_acc": 0.4552
+      },
+      "wallclock_s": 2076.0778346569277,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar100_noise=0.60_seed=2",
+      "arch": "resnet18",
+      "dataset": "cifar100",
+      "noise_rate": 0.6,
+      "seed": 2,
+      "final_eval": {
+        "val_loss": 2.586527918243408,
+        "val_acc": 0.4577
+      },
+      "wallclock_s": 1975.4807394070085,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar100_noise=0.60_seed=3",
+      "arch": "resnet18",
+      "dataset": "cifar100",
+      "noise_rate": 0.6,
+      "seed": 3,
+      "final_eval": {
+        "val_loss": 2.588333094406128,
+        "val_acc": 0.4567
+      },
+      "wallclock_s": 1974.828962143045,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar100_noise=0.60_seed=4",
+      "arch": "resnet18",
+      "dataset": "cifar100",
+      "noise_rate": 0.6,
+      "seed": 4,
+      "final_eval": {
+        "val_loss": 2.6474218631744386,
+        "val_acc": 0.4446
+      },
+      "wallclock_s": 2004.0714584351517,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar100_noise=0.60_seed=5",
+      "arch": "resnet18",
+      "dataset": "cifar100",
+      "noise_rate": 0.6,
+      "seed": 5,
+      "final_eval": {
+        "val_loss": 2.5885543830871582,
+        "val_acc": 0.4609
+      },
+      "wallclock_s": 1992.249952255981,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar100_noise=0.60_seed=6",
+      "arch": "resnet18",
+      "dataset": "cifar100",
+      "noise_rate": 0.6,
+      "seed": 6,
+      "final_eval": {
+        "val_loss": 2.578149516296387,
+        "val_acc": 0.4609
+      },
+      "wallclock_s": 2103.5037293208297,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar100_noise=0.60_seed=7",
+      "arch": "resnet18",
+      "dataset": "cifar100",
+      "noise_rate": 0.6,
+      "seed": 7,
+      "final_eval": {
+        "val_loss": 2.596694524383545,
+        "val_acc": 0.458
+      },
+      "wallclock_s": 2102.5350024190266,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar100_noise=0.60_seed=8",
+      "arch": "resnet18",
+      "dataset": "cifar100",
+      "noise_rate": 0.6,
+      "seed": 8,
+      "final_eval": {
+        "val_loss": 2.5988145751953127,
+        "val_acc": 0.4598
+      },
+      "wallclock_s": 1970.0818661481608,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar100_noise=0.60_seed=9",
+      "arch": "resnet18",
+      "dataset": "cifar100",
+      "noise_rate": 0.6,
+      "seed": 9,
+      "final_eval": {
+        "val_loss": 2.6369602962493897,
+        "val_acc": 0.4432
+      },
+      "wallclock_s": 1969.0432871440426,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar10_noise=0.00_seed=0",
+      "arch": "resnet18",
+      "dataset": "cifar10",
+      "noise_rate": 0.0,
+      "seed": 0,
+      "final_eval": {
+        "val_loss": 0.22861169891357422,
+        "val_acc": 0.9331
+      },
+      "wallclock_s": 2075.349907348049,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar10_noise=0.00_seed=1",
+      "arch": "resnet18",
+      "dataset": "cifar10",
+      "noise_rate": 0.0,
+      "seed": 1,
+      "final_eval": {
+        "val_loss": 0.2176816746234894,
+        "val_acc": 0.9378
+      },
+      "wallclock_s": 2005.2150916750543,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar10_noise=0.00_seed=10",
+      "arch": "resnet18",
+      "dataset": "cifar10",
+      "noise_rate": 0.0,
+      "seed": 10,
+      "final_eval": {
+        "val_loss": 0.21937817449569702,
+        "val_acc": 0.9347
+      },
+      "wallclock_s": 3439.949465869926,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar10_noise=0.00_seed=11",
+      "arch": "resnet18",
+      "dataset": "cifar10",
+      "noise_rate": 0.0,
+      "seed": 11,
+      "final_eval": {
+        "val_loss": 0.22433502745628356,
+        "val_acc": 0.9341
+      },
+      "wallclock_s": 2013.726957662031,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar10_noise=0.00_seed=12",
+      "arch": "resnet18",
+      "dataset": "cifar10",
+      "noise_rate": 0.0,
+      "seed": 12,
+      "final_eval": {
+        "val_loss": 0.2309025589466095,
+        "val_acc": 0.9319
+      },
+      "wallclock_s": 2016.0846478170715,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar10_noise=0.00_seed=13",
+      "arch": "resnet18",
+      "dataset": "cifar10",
+      "noise_rate": 0.0,
+      "seed": 13,
+      "final_eval": {
+        "val_loss": 0.23073020415306092,
+        "val_acc": 0.9332
+      },
+      "wallclock_s": 3379.962709049927,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar10_noise=0.00_seed=14",
+      "arch": "resnet18",
+      "dataset": "cifar10",
+      "noise_rate": 0.0,
+      "seed": 14,
+      "final_eval": {
+        "val_loss": 0.22982691712379455,
+        "val_acc": 0.9332
+      },
+      "wallclock_s": 2015.3810259699821,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar10_noise=0.00_seed=15",
+      "arch": "resnet18",
+      "dataset": "cifar10",
+      "noise_rate": 0.0,
+      "seed": 15,
+      "final_eval": {
+        "val_loss": 0.2238485176563263,
+        "val_acc": 0.9318
+      },
+      "wallclock_s": 2016.407344364794,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar10_noise=0.00_seed=16",
+      "arch": "resnet18",
+      "dataset": "cifar10",
+      "noise_rate": 0.0,
+      "seed": 16,
+      "final_eval": {
+        "val_loss": 0.23112462692260743,
+        "val_acc": 0.9332
+      },
+      "wallclock_s": 2000.5223883020226,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar10_noise=0.00_seed=17",
+      "arch": "resnet18",
+      "dataset": "cifar10",
+      "noise_rate": 0.0,
+      "seed": 17,
+      "final_eval": {
+        "val_loss": 0.22046499156951904,
+        "val_acc": 0.9328
+      },
+      "wallclock_s": 2002.4023208201397,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar10_noise=0.00_seed=18",
+      "arch": "resnet18",
+      "dataset": "cifar10",
+      "noise_rate": 0.0,
+      "seed": 18,
+      "final_eval": {
+        "val_loss": 0.22003040561676027,
+        "val_acc": 0.9337
+      },
+      "wallclock_s": 1981.169510066975,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar10_noise=0.00_seed=19",
+      "arch": "resnet18",
+      "dataset": "cifar10",
+      "noise_rate": 0.0,
+      "seed": 19,
+      "final_eval": {
+        "val_loss": 0.21394048633575438,
+        "val_acc": 0.936
+      },
+      "wallclock_s": 1980.4333185220603,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar10_noise=0.00_seed=2",
+      "arch": "resnet18",
+      "dataset": "cifar10",
+      "noise_rate": 0.0,
+      "seed": 2,
+      "final_eval": {
+        "val_loss": 0.21767281346321107,
+        "val_acc": 0.935
+      },
+      "wallclock_s": 2022.2910097070271,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar10_noise=0.00_seed=3",
+      "arch": "resnet18",
+      "dataset": "cifar10",
+      "noise_rate": 0.0,
+      "seed": 3,
+      "final_eval": {
+        "val_loss": 0.21693151459693907,
+        "val_acc": 0.9352
+      },
+      "wallclock_s": 2076.5031199579826,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar10_noise=0.00_seed=4",
+      "arch": "resnet18",
+      "dataset": "cifar10",
+      "noise_rate": 0.0,
+      "seed": 4,
+      "final_eval": {
+        "val_loss": 0.21801890840530397,
+        "val_acc": 0.9351
+      },
+      "wallclock_s": 2009.006603398011,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar10_noise=0.00_seed=5",
+      "arch": "resnet18",
+      "dataset": "cifar10",
+      "noise_rate": 0.0,
+      "seed": 5,
+      "final_eval": {
+        "val_loss": 0.23134645071029664,
+        "val_acc": 0.93
+      },
+      "wallclock_s": 2022.259208463016,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar10_noise=0.00_seed=6",
+      "arch": "resnet18",
+      "dataset": "cifar10",
+      "noise_rate": 0.0,
+      "seed": 6,
+      "final_eval": {
+        "val_loss": 0.22717663021087647,
+        "val_acc": 0.9324
+      },
+      "wallclock_s": 2003.9173222649843,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar10_noise=0.00_seed=7",
+      "arch": "resnet18",
+      "dataset": "cifar10",
+      "noise_rate": 0.0,
+      "seed": 7,
+      "final_eval": {
+        "val_loss": 0.21901245391368865,
+        "val_acc": 0.9357
+      },
+      "wallclock_s": 2000.9249652139843,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar10_noise=0.00_seed=8",
+      "arch": "resnet18",
+      "dataset": "cifar10",
+      "noise_rate": 0.0,
+      "seed": 8,
+      "final_eval": {
+        "val_loss": 0.2165702067375183,
+        "val_acc": 0.937
+      },
+      "wallclock_s": 1994.3075931520434,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar10_noise=0.00_seed=9",
+      "arch": "resnet18",
+      "dataset": "cifar10",
+      "noise_rate": 0.0,
+      "seed": 9,
+      "final_eval": {
+        "val_loss": 0.22854138250350953,
+        "val_acc": 0.9345
+      },
+      "wallclock_s": 1994.6056277609896,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar10_noise=0.25_seed=0",
+      "arch": "resnet18",
+      "dataset": "cifar10",
+      "noise_rate": 0.25,
+      "seed": 0,
+      "final_eval": {
+        "val_loss": 0.5749095886230469,
+        "val_acc": 0.8715
+      },
+      "wallclock_s": 2076.569800582947,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar10_noise=0.25_seed=1",
+      "arch": "resnet18",
+      "dataset": "cifar10",
+      "noise_rate": 0.25,
+      "seed": 1,
+      "final_eval": {
+        "val_loss": 0.5768618160247803,
+        "val_acc": 0.8734
+      },
+      "wallclock_s": 2074.017579423031,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar10_noise=0.25_seed=2",
+      "arch": "resnet18",
+      "dataset": "cifar10",
+      "noise_rate": 0.25,
+      "seed": 2,
+      "final_eval": {
+        "val_loss": 0.5593427435874939,
+        "val_acc": 0.8781
+      },
+      "wallclock_s": 2006.690636969055,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar10_noise=0.25_seed=3",
+      "arch": "resnet18",
+      "dataset": "cifar10",
+      "noise_rate": 0.25,
+      "seed": 3,
+      "final_eval": {
+        "val_loss": 0.5776457276344299,
+        "val_acc": 0.8721
+      },
+      "wallclock_s": 2003.5548778850352,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar10_noise=0.25_seed=4",
+      "arch": "resnet18",
+      "dataset": "cifar10",
+      "noise_rate": 0.25,
+      "seed": 4,
+      "final_eval": {
+        "val_loss": 0.5776851387500763,
+        "val_acc": 0.872
+      },
+      "wallclock_s": 2007.4661746490747,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar10_noise=0.25_seed=5",
+      "arch": "resnet18",
+      "dataset": "cifar10",
+      "noise_rate": 0.25,
+      "seed": 5,
+      "final_eval": {
+        "val_loss": 0.5764839448928833,
+        "val_acc": 0.8757
+      },
+      "wallclock_s": 2007.5150783449644,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar10_noise=0.25_seed=6",
+      "arch": "resnet18",
+      "dataset": "cifar10",
+      "noise_rate": 0.25,
+      "seed": 6,
+      "final_eval": {
+        "val_loss": 0.5839222780227661,
+        "val_acc": 0.8756
+      },
+      "wallclock_s": 2076.4424373629736,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar10_noise=0.25_seed=7",
+      "arch": "resnet18",
+      "dataset": "cifar10",
+      "noise_rate": 0.25,
+      "seed": 7,
+      "final_eval": {
+        "val_loss": 0.569124335193634,
+        "val_acc": 0.8766
+      },
+      "wallclock_s": 2074.965740183019,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar10_noise=0.25_seed=8",
+      "arch": "resnet18",
+      "dataset": "cifar10",
+      "noise_rate": 0.25,
+      "seed": 8,
+      "final_eval": {
+        "val_loss": 0.5684065416336059,
+        "val_acc": 0.8784
+      },
+      "wallclock_s": 2006.1274602009216,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar10_noise=0.25_seed=9",
+      "arch": "resnet18",
+      "dataset": "cifar10",
+      "noise_rate": 0.25,
+      "seed": 9,
+      "final_eval": {
+        "val_loss": 0.5849489253044129,
+        "val_acc": 0.8704
+      },
+      "wallclock_s": 2002.213398062042,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar10_noise=0.40_seed=0",
+      "arch": "resnet18",
+      "dataset": "cifar10",
+      "noise_rate": 0.4,
+      "seed": 0,
+      "final_eval": {
+        "val_loss": 0.8112941152572631,
+        "val_acc": 0.8384
+      },
+      "wallclock_s": 2012.0925467850175,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar10_noise=0.40_seed=1",
+      "arch": "resnet18",
+      "dataset": "cifar10",
+      "noise_rate": 0.4,
+      "seed": 1,
+      "final_eval": {
+        "val_loss": 0.8174948043823242,
+        "val_acc": 0.8384
+      },
+      "wallclock_s": 2012.1495000330033,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar10_noise=0.40_seed=2",
+      "arch": "resnet18",
+      "dataset": "cifar10",
+      "noise_rate": 0.4,
+      "seed": 2,
+      "final_eval": {
+        "val_loss": 0.7965026736259461,
+        "val_acc": 0.845
+      },
+      "wallclock_s": 2069.5158000809606,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar10_noise=0.40_seed=3",
+      "arch": "resnet18",
+      "dataset": "cifar10",
+      "noise_rate": 0.4,
+      "seed": 3,
+      "final_eval": {
+        "val_loss": 0.819109578704834,
+        "val_acc": 0.844
+      },
+      "wallclock_s": 2066.089322482934,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar10_noise=0.40_seed=4",
+      "arch": "resnet18",
+      "dataset": "cifar10",
+      "noise_rate": 0.4,
+      "seed": 4,
+      "final_eval": {
+        "val_loss": 0.7983470797538758,
+        "val_acc": 0.8484
+      },
+      "wallclock_s": 2003.6302725909045,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar10_noise=0.40_seed=5",
+      "arch": "resnet18",
+      "dataset": "cifar10",
+      "noise_rate": 0.4,
+      "seed": 5,
+      "final_eval": {
+        "val_loss": 0.8107053812026978,
+        "val_acc": 0.8469
+      },
+      "wallclock_s": 1999.8200623459416,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar10_noise=0.40_seed=6",
+      "arch": "resnet18",
+      "dataset": "cifar10",
+      "noise_rate": 0.4,
+      "seed": 6,
+      "final_eval": {
+        "val_loss": 0.8203438446044922,
+        "val_acc": 0.8396
+      },
+      "wallclock_s": 1993.0103512719506,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar10_noise=0.40_seed=7",
+      "arch": "resnet18",
+      "dataset": "cifar10",
+      "noise_rate": 0.4,
+      "seed": 7,
+      "final_eval": {
+        "val_loss": 0.8189911789894104,
+        "val_acc": 0.8473
+      },
+      "wallclock_s": 1993.9810918030562,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar10_noise=0.40_seed=8",
+      "arch": "resnet18",
+      "dataset": "cifar10",
+      "noise_rate": 0.4,
+      "seed": 8,
+      "final_eval": {
+        "val_loss": 0.8088914723396301,
+        "val_acc": 0.8399
+      },
+      "wallclock_s": 2066.6217690749327,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar10_noise=0.40_seed=9",
+      "arch": "resnet18",
+      "dataset": "cifar10",
+      "noise_rate": 0.4,
+      "seed": 9,
+      "final_eval": {
+        "val_loss": 0.8199991644859314,
+        "val_acc": 0.8397
+      },
+      "wallclock_s": 2064.036590857897,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar10_noise=0.60_seed=0",
+      "arch": "resnet18",
+      "dataset": "cifar10",
+      "noise_rate": 0.6,
+      "seed": 0,
+      "final_eval": {
+        "val_loss": 1.2414324382781983,
+        "val_acc": 0.7839
+      },
+      "wallclock_s": 2002.0498594229575,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar10_noise=0.60_seed=1",
+      "arch": "resnet18",
+      "dataset": "cifar10",
+      "noise_rate": 0.6,
+      "seed": 1,
+      "final_eval": {
+        "val_loss": 1.2677944326400756,
+        "val_acc": 0.7733
+      },
+      "wallclock_s": 1997.0056983961258,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar10_noise=0.60_seed=2",
+      "arch": "resnet18",
+      "dataset": "cifar10",
+      "noise_rate": 0.6,
+      "seed": 2,
+      "final_eval": {
+        "val_loss": 1.2519420795440674,
+        "val_acc": 0.7791
+      },
+      "wallclock_s": 1971.6972034899518,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar10_noise=0.60_seed=3",
+      "arch": "resnet18",
+      "dataset": "cifar10",
+      "noise_rate": 0.6,
+      "seed": 3,
+      "final_eval": {
+        "val_loss": 1.2755427730560303,
+        "val_acc": 0.7766
+      },
+      "wallclock_s": 1969.0088561230805,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar10_noise=0.60_seed=4",
+      "arch": "resnet18",
+      "dataset": "cifar10",
+      "noise_rate": 0.6,
+      "seed": 4,
+      "final_eval": {
+        "val_loss": 1.2255264980316163,
+        "val_acc": 0.7833
+      },
+      "wallclock_s": 2071.2082605198957,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar10_noise=0.60_seed=5",
+      "arch": "resnet18",
+      "dataset": "cifar10",
+      "noise_rate": 0.6,
+      "seed": 5,
+      "final_eval": {
+        "val_loss": 1.2379562267303468,
+        "val_acc": 0.7891
+      },
+      "wallclock_s": 2070.1913285949267,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar10_noise=0.60_seed=6",
+      "arch": "resnet18",
+      "dataset": "cifar10",
+      "noise_rate": 0.6,
+      "seed": 6,
+      "final_eval": {
+        "val_loss": 1.2454410865783692,
+        "val_acc": 0.7861
+      },
+      "wallclock_s": 1977.9416080748197,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar10_noise=0.60_seed=7",
+      "arch": "resnet18",
+      "dataset": "cifar10",
+      "noise_rate": 0.6,
+      "seed": 7,
+      "final_eval": {
+        "val_loss": 1.2613286556243897,
+        "val_acc": 0.7837
+      },
+      "wallclock_s": 1975.7158954339102,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar10_noise=0.60_seed=8",
+      "arch": "resnet18",
+      "dataset": "cifar10",
+      "noise_rate": 0.6,
+      "seed": 8,
+      "final_eval": {
+        "val_loss": 1.2936884700775146,
+        "val_acc": 0.77
+      },
+      "wallclock_s": 2007.5460919770412,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet18_dataset=cifar10_noise=0.60_seed=9",
+      "arch": "resnet18",
+      "dataset": "cifar10",
+      "noise_rate": 0.6,
+      "seed": 9,
+      "final_eval": {
+        "val_loss": 1.2509657009124755,
+        "val_acc": 0.7804
+      },
+      "wallclock_s": 1994.8312143022195,
+      "n_layers": 41
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar100_noise=0.00_seed=0",
+      "arch": "resnet34",
+      "dataset": "cifar100",
+      "noise_rate": 0.0,
+      "seed": 0,
+      "final_eval": {
+        "val_loss": 1.0112641761779786,
+        "val_acc": 0.7476
+      },
+      "wallclock_s": 3231.2643354339525,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar100_noise=0.00_seed=1",
+      "arch": "resnet34",
+      "dataset": "cifar100",
+      "noise_rate": 0.0,
+      "seed": 1,
+      "final_eval": {
+        "val_loss": 1.0165572405815124,
+        "val_acc": 0.7484
+      },
+      "wallclock_s": 3230.341298239073,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar100_noise=0.00_seed=10",
+      "arch": "resnet34",
+      "dataset": "cifar100",
+      "noise_rate": 0.0,
+      "seed": 10,
+      "final_eval": {
+        "val_loss": 1.0338264375686645,
+        "val_acc": 0.7474
+      },
+      "wallclock_s": 5317.191353249829,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar100_noise=0.00_seed=11",
+      "arch": "resnet34",
+      "dataset": "cifar100",
+      "noise_rate": 0.0,
+      "seed": 11,
+      "final_eval": {
+        "val_loss": 1.0455025625228882,
+        "val_acc": 0.7417
+      },
+      "wallclock_s": 5270.424802066991,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar100_noise=0.00_seed=12",
+      "arch": "resnet34",
+      "dataset": "cifar100",
+      "noise_rate": 0.0,
+      "seed": 12,
+      "final_eval": {
+        "val_loss": 1.0481690879821777,
+        "val_acc": 0.7444
+      },
+      "wallclock_s": 3184.3606355399825,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar100_noise=0.00_seed=13",
+      "arch": "resnet34",
+      "dataset": "cifar100",
+      "noise_rate": 0.0,
+      "seed": 13,
+      "final_eval": {
+        "val_loss": 1.0109897363662719,
+        "val_acc": 0.7517
+      },
+      "wallclock_s": 3182.0879365950823,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar100_noise=0.00_seed=14",
+      "arch": "resnet34",
+      "dataset": "cifar100",
+      "noise_rate": 0.0,
+      "seed": 14,
+      "final_eval": {
+        "val_loss": 1.0282339113235475,
+        "val_acc": 0.7457
+      },
+      "wallclock_s": 3176.0007112780586,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar100_noise=0.00_seed=15",
+      "arch": "resnet34",
+      "dataset": "cifar100",
+      "noise_rate": 0.0,
+      "seed": 15,
+      "final_eval": {
+        "val_loss": 1.0117638748168944,
+        "val_acc": 0.7534
+      },
+      "wallclock_s": 3149.2556752641685,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar100_noise=0.00_seed=16",
+      "arch": "resnet34",
+      "dataset": "cifar100",
+      "noise_rate": 0.0,
+      "seed": 16,
+      "final_eval": {
+        "val_loss": 1.0109135620117187,
+        "val_acc": 0.75
+      },
+      "wallclock_s": 3112.7692627799697,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar100_noise=0.00_seed=17",
+      "arch": "resnet34",
+      "dataset": "cifar100",
+      "noise_rate": 0.0,
+      "seed": 17,
+      "final_eval": {
+        "val_loss": 1.1124845468521118,
+        "val_acc": 0.7168
+      },
+      "wallclock_s": 3126.344267308945,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar100_noise=0.00_seed=18",
+      "arch": "resnet34",
+      "dataset": "cifar100",
+      "noise_rate": 0.0,
+      "seed": 18,
+      "final_eval": {
+        "val_loss": 1.0175458223342895,
+        "val_acc": 0.746
+      },
+      "wallclock_s": 3167.510888831923,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar100_noise=0.00_seed=19",
+      "arch": "resnet34",
+      "dataset": "cifar100",
+      "noise_rate": 0.0,
+      "seed": 19,
+      "final_eval": {
+        "val_loss": 1.0131328620910645,
+        "val_acc": 0.7458
+      },
+      "wallclock_s": 3151.2809708949644,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar100_noise=0.00_seed=2",
+      "arch": "resnet34",
+      "dataset": "cifar100",
+      "noise_rate": 0.0,
+      "seed": 2,
+      "final_eval": {
+        "val_loss": 1.0314630895614625,
+        "val_acc": 0.7466
+      },
+      "wallclock_s": 3132.4769723829813,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar100_noise=0.00_seed=3",
+      "arch": "resnet34",
+      "dataset": "cifar100",
+      "noise_rate": 0.0,
+      "seed": 3,
+      "final_eval": {
+        "val_loss": 1.027784602355957,
+        "val_acc": 0.7466
+      },
+      "wallclock_s": 3128.726455050055,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar100_noise=0.00_seed=4",
+      "arch": "resnet34",
+      "dataset": "cifar100",
+      "noise_rate": 0.0,
+      "seed": 4,
+      "final_eval": {
+        "val_loss": 1.0187973403930664,
+        "val_acc": 0.7453
+      },
+      "wallclock_s": 3161.758138339035,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar100_noise=0.00_seed=5",
+      "arch": "resnet34",
+      "dataset": "cifar100",
+      "noise_rate": 0.0,
+      "seed": 5,
+      "final_eval": {
+        "val_loss": 1.0335535499572754,
+        "val_acc": 0.7435
+      },
+      "wallclock_s": 3163.5712182710413,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar100_noise=0.00_seed=6",
+      "arch": "resnet34",
+      "dataset": "cifar100",
+      "noise_rate": 0.0,
+      "seed": 6,
+      "final_eval": {
+        "val_loss": 1.0340816822052001,
+        "val_acc": 0.7443
+      },
+      "wallclock_s": 3268.909847429022,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar100_noise=0.00_seed=7",
+      "arch": "resnet34",
+      "dataset": "cifar100",
+      "noise_rate": 0.0,
+      "seed": 7,
+      "final_eval": {
+        "val_loss": 1.0473947185516357,
+        "val_acc": 0.7391
+      },
+      "wallclock_s": 3265.9231253690086,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar100_noise=0.00_seed=8",
+      "arch": "resnet34",
+      "dataset": "cifar100",
+      "noise_rate": 0.0,
+      "seed": 8,
+      "final_eval": {
+        "val_loss": 1.0187517230987548,
+        "val_acc": 0.7554
+      },
+      "wallclock_s": 3136.5768865719438,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar100_noise=0.00_seed=9",
+      "arch": "resnet34",
+      "dataset": "cifar100",
+      "noise_rate": 0.0,
+      "seed": 9,
+      "final_eval": {
+        "val_loss": 1.0324334250450133,
+        "val_acc": 0.7502
+      },
+      "wallclock_s": 3132.4650090618525,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar100_noise=0.25_seed=0",
+      "arch": "resnet34",
+      "dataset": "cifar100",
+      "noise_rate": 0.25,
+      "seed": 0,
+      "final_eval": {
+        "val_loss": 1.6814851005554199,
+        "val_acc": 0.628
+      },
+      "wallclock_s": 3517.998682396952,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar100_noise=0.25_seed=1",
+      "arch": "resnet34",
+      "dataset": "cifar100",
+      "noise_rate": 0.25,
+      "seed": 1,
+      "final_eval": {
+        "val_loss": 1.691721830368042,
+        "val_acc": 0.6196
+      },
+      "wallclock_s": 3517.625299124047,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar100_noise=0.25_seed=2",
+      "arch": "resnet34",
+      "dataset": "cifar100",
+      "noise_rate": 0.25,
+      "seed": 2,
+      "final_eval": {
+        "val_loss": 1.6947624956130982,
+        "val_acc": 0.618
+      },
+      "wallclock_s": 3271.6117089318577,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar100_noise=0.25_seed=3",
+      "arch": "resnet34",
+      "dataset": "cifar100",
+      "noise_rate": 0.25,
+      "seed": 3,
+      "final_eval": {
+        "val_loss": 1.6476617065429688,
+        "val_acc": 0.6297
+      },
+      "wallclock_s": 3247.163896016078,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar100_noise=0.25_seed=4",
+      "arch": "resnet34",
+      "dataset": "cifar100",
+      "noise_rate": 0.25,
+      "seed": 4,
+      "final_eval": {
+        "val_loss": 1.7191370044708252,
+        "val_acc": 0.6095
+      },
+      "wallclock_s": 3163.976826808881,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar100_noise=0.25_seed=5",
+      "arch": "resnet34",
+      "dataset": "cifar100",
+      "noise_rate": 0.25,
+      "seed": 5,
+      "final_eval": {
+        "val_loss": 1.6862291349411012,
+        "val_acc": 0.6185
+      },
+      "wallclock_s": 3160.012053897837,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar100_noise=0.25_seed=6",
+      "arch": "resnet34",
+      "dataset": "cifar100",
+      "noise_rate": 0.25,
+      "seed": 6,
+      "final_eval": {
+        "val_loss": 1.7177573390960694,
+        "val_acc": 0.6167
+      },
+      "wallclock_s": 3292.083709571045,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar100_noise=0.25_seed=7",
+      "arch": "resnet34",
+      "dataset": "cifar100",
+      "noise_rate": 0.25,
+      "seed": 7,
+      "final_eval": {
+        "val_loss": 1.6428683511734008,
+        "val_acc": 0.6341
+      },
+      "wallclock_s": 3292.7780126361176,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar100_noise=0.25_seed=8",
+      "arch": "resnet34",
+      "dataset": "cifar100",
+      "noise_rate": 0.25,
+      "seed": 8,
+      "final_eval": {
+        "val_loss": 1.6686800815582274,
+        "val_acc": 0.625
+      },
+      "wallclock_s": 3409.0701567239594,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar100_noise=0.25_seed=9",
+      "arch": "resnet34",
+      "dataset": "cifar100",
+      "noise_rate": 0.25,
+      "seed": 9,
+      "final_eval": {
+        "val_loss": 1.7368114261627197,
+        "val_acc": 0.6081
+      },
+      "wallclock_s": 3402.7934018010274,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar100_noise=0.40_seed=0",
+      "arch": "resnet34",
+      "dataset": "cifar100",
+      "noise_rate": 0.4,
+      "seed": 0,
+      "final_eval": {
+        "val_loss": 1.998717409133911,
+        "val_acc": 0.5655
+      },
+      "wallclock_s": 3136.750674184179,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar100_noise=0.40_seed=1",
+      "arch": "resnet34",
+      "dataset": "cifar100",
+      "noise_rate": 0.4,
+      "seed": 1,
+      "final_eval": {
+        "val_loss": 2.037383408546448,
+        "val_acc": 0.5515
+      },
+      "wallclock_s": 3133.041086914018,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar100_noise=0.40_seed=2",
+      "arch": "resnet34",
+      "dataset": "cifar100",
+      "noise_rate": 0.4,
+      "seed": 2,
+      "final_eval": {
+        "val_loss": 2.0183741821289063,
+        "val_acc": 0.5613
+      },
+      "wallclock_s": 3153.5421847451944,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar100_noise=0.40_seed=3",
+      "arch": "resnet34",
+      "dataset": "cifar100",
+      "noise_rate": 0.4,
+      "seed": 3,
+      "final_eval": {
+        "val_loss": 1.9577078136444093,
+        "val_acc": 0.5811
+      },
+      "wallclock_s": 3152.8956637121737,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar100_noise=0.40_seed=4",
+      "arch": "resnet34",
+      "dataset": "cifar100",
+      "noise_rate": 0.4,
+      "seed": 4,
+      "final_eval": {
+        "val_loss": 2.0442037521362306,
+        "val_acc": 0.5543
+      },
+      "wallclock_s": 4892.887333063176,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar100_noise=0.40_seed=5",
+      "arch": "resnet34",
+      "dataset": "cifar100",
+      "noise_rate": 0.4,
+      "seed": 5,
+      "final_eval": {
+        "val_loss": 1.9426195976257323,
+        "val_acc": 0.5793
+      },
+      "wallclock_s": 4914.455167610897,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar100_noise=0.40_seed=6",
+      "arch": "resnet34",
+      "dataset": "cifar100",
+      "noise_rate": 0.4,
+      "seed": 6,
+      "final_eval": {
+        "val_loss": 1.9462056243896484,
+        "val_acc": 0.5786
+      },
+      "wallclock_s": 3127.836182556115,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar100_noise=0.40_seed=7",
+      "arch": "resnet34",
+      "dataset": "cifar100",
+      "noise_rate": 0.4,
+      "seed": 7,
+      "final_eval": {
+        "val_loss": 2.0210062532424926,
+        "val_acc": 0.5604
+      },
+      "wallclock_s": 3128.4157038379926,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar100_noise=0.40_seed=8",
+      "arch": "resnet34",
+      "dataset": "cifar100",
+      "noise_rate": 0.4,
+      "seed": 8,
+      "final_eval": {
+        "val_loss": 1.9750968799591064,
+        "val_acc": 0.5728
+      },
+      "wallclock_s": 3156.124074742198,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar100_noise=0.40_seed=9",
+      "arch": "resnet34",
+      "dataset": "cifar100",
+      "noise_rate": 0.4,
+      "seed": 9,
+      "final_eval": {
+        "val_loss": 2.044018871498108,
+        "val_acc": 0.5458
+      },
+      "wallclock_s": 3164.558681762079,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar100_noise=0.60_seed=0",
+      "arch": "resnet34",
+      "dataset": "cifar100",
+      "noise_rate": 0.6,
+      "seed": 0,
+      "final_eval": {
+        "val_loss": 2.432243402862549,
+        "val_acc": 0.4907
+      },
+      "wallclock_s": 5302.386656184914,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar100_noise=0.60_seed=1",
+      "arch": "resnet34",
+      "dataset": "cifar100",
+      "noise_rate": 0.6,
+      "seed": 1,
+      "final_eval": {
+        "val_loss": 2.4720350914001465,
+        "val_acc": 0.4766
+      },
+      "wallclock_s": 5295.717993545113,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar100_noise=0.60_seed=2",
+      "arch": "resnet34",
+      "dataset": "cifar100",
+      "noise_rate": 0.6,
+      "seed": 2,
+      "final_eval": {
+        "val_loss": 2.527873777770996,
+        "val_acc": 0.4714
+      },
+      "wallclock_s": 3140.61933274311,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar100_noise=0.60_seed=3",
+      "arch": "resnet34",
+      "dataset": "cifar100",
+      "noise_rate": 0.6,
+      "seed": 3,
+      "final_eval": {
+        "val_loss": 2.521591480255127,
+        "val_acc": 0.4681
+      },
+      "wallclock_s": 3136.535782136023,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar100_noise=0.60_seed=4",
+      "arch": "resnet34",
+      "dataset": "cifar100",
+      "noise_rate": 0.6,
+      "seed": 4,
+      "final_eval": {
+        "val_loss": 2.5175612323760985,
+        "val_acc": 0.467
+      },
+      "wallclock_s": 3150.0755331860855,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar100_noise=0.60_seed=5",
+      "arch": "resnet34",
+      "dataset": "cifar100",
+      "noise_rate": 0.6,
+      "seed": 5,
+      "final_eval": {
+        "val_loss": 2.481793185043335,
+        "val_acc": 0.4861
+      },
+      "wallclock_s": 3141.673822185956,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar100_noise=0.60_seed=6",
+      "arch": "resnet34",
+      "dataset": "cifar100",
+      "noise_rate": 0.6,
+      "seed": 6,
+      "final_eval": {
+        "val_loss": 2.422692018890381,
+        "val_acc": 0.4936
+      },
+      "wallclock_s": 3171.6611253910232,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar100_noise=0.60_seed=7",
+      "arch": "resnet34",
+      "dataset": "cifar100",
+      "noise_rate": 0.6,
+      "seed": 7,
+      "final_eval": {
+        "val_loss": 2.428937470245361,
+        "val_acc": 0.4982
+      },
+      "wallclock_s": 3168.7269874329213,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar100_noise=0.60_seed=8",
+      "arch": "resnet34",
+      "dataset": "cifar100",
+      "noise_rate": 0.6,
+      "seed": 8,
+      "final_eval": {
+        "val_loss": 2.5644729042053225,
+        "val_acc": 0.4596
+      },
+      "wallclock_s": 3147.032166057965,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar100_noise=0.60_seed=9",
+      "arch": "resnet34",
+      "dataset": "cifar100",
+      "noise_rate": 0.6,
+      "seed": 9,
+      "final_eval": {
+        "val_loss": 2.492172037887573,
+        "val_acc": 0.4802
+      },
+      "wallclock_s": 3138.675930391997,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar10_noise=0.00_seed=0",
+      "arch": "resnet34",
+      "dataset": "cifar10",
+      "noise_rate": 0.0,
+      "seed": 0,
+      "final_eval": {
+        "val_loss": 0.2522300521850586,
+        "val_acc": 0.9275
+      },
+      "wallclock_s": 3271.9355252608657,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar10_noise=0.00_seed=1",
+      "arch": "resnet34",
+      "dataset": "cifar10",
+      "noise_rate": 0.0,
+      "seed": 1,
+      "final_eval": {
+        "val_loss": 0.2610340906262398,
+        "val_acc": 0.9232
+      },
+      "wallclock_s": 3277.345502112992,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar10_noise=0.00_seed=10",
+      "arch": "resnet34",
+      "dataset": "cifar10",
+      "noise_rate": 0.0,
+      "seed": 10,
+      "final_eval": {
+        "val_loss": 0.24205607080459596,
+        "val_acc": 0.9311
+      },
+      "wallclock_s": 3135.961054777028,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar10_noise=0.00_seed=11",
+      "arch": "resnet34",
+      "dataset": "cifar10",
+      "noise_rate": 0.0,
+      "seed": 11,
+      "final_eval": {
+        "val_loss": 0.2518464787006378,
+        "val_acc": 0.9285
+      },
+      "wallclock_s": 3133.648996860953,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar10_noise=0.00_seed=12",
+      "arch": "resnet34",
+      "dataset": "cifar10",
+      "noise_rate": 0.0,
+      "seed": 12,
+      "final_eval": {
+        "val_loss": 0.23845900552272797,
+        "val_acc": 0.9337
+      },
+      "wallclock_s": 5293.864128849935,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar10_noise=0.00_seed=13",
+      "arch": "resnet34",
+      "dataset": "cifar10",
+      "noise_rate": 0.0,
+      "seed": 13,
+      "final_eval": {
+        "val_loss": 0.24235969791412354,
+        "val_acc": 0.9311
+      },
+      "wallclock_s": 3170.149245661916,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar10_noise=0.00_seed=14",
+      "arch": "resnet34",
+      "dataset": "cifar10",
+      "noise_rate": 0.0,
+      "seed": 14,
+      "final_eval": {
+        "val_loss": 0.23134460587501526,
+        "val_acc": 0.932
+      },
+      "wallclock_s": 3165.755548960995,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar10_noise=0.00_seed=15",
+      "arch": "resnet34",
+      "dataset": "cifar10",
+      "noise_rate": 0.0,
+      "seed": 15,
+      "final_eval": {
+        "val_loss": 0.23482403235435487,
+        "val_acc": 0.9325
+      },
+      "wallclock_s": 5313.549234060105,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar10_noise=0.00_seed=16",
+      "arch": "resnet34",
+      "dataset": "cifar10",
+      "noise_rate": 0.0,
+      "seed": 16,
+      "final_eval": {
+        "val_loss": 0.23157651681900024,
+        "val_acc": 0.9343
+      },
+      "wallclock_s": 3135.8656195248477,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar10_noise=0.00_seed=17",
+      "arch": "resnet34",
+      "dataset": "cifar10",
+      "noise_rate": 0.0,
+      "seed": 17,
+      "final_eval": {
+        "val_loss": 0.22994938015937805,
+        "val_acc": 0.9339
+      },
+      "wallclock_s": 3131.0149820330553,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar10_noise=0.00_seed=18",
+      "arch": "resnet34",
+      "dataset": "cifar10",
+      "noise_rate": 0.0,
+      "seed": 18,
+      "final_eval": {
+        "val_loss": 0.23539244842529297,
+        "val_acc": 0.9328
+      },
+      "wallclock_s": 3170.7824586881325,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar10_noise=0.00_seed=19",
+      "arch": "resnet34",
+      "dataset": "cifar10",
+      "noise_rate": 0.0,
+      "seed": 19,
+      "final_eval": {
+        "val_loss": 0.2208697548866272,
+        "val_acc": 0.9381
+      },
+      "wallclock_s": 3166.000945903128,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar10_noise=0.00_seed=2",
+      "arch": "resnet34",
+      "dataset": "cifar10",
+      "noise_rate": 0.0,
+      "seed": 2,
+      "final_eval": {
+        "val_loss": 0.2476919521331787,
+        "val_acc": 0.9332
+      },
+      "wallclock_s": 3188.9087741780095,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar10_noise=0.00_seed=3",
+      "arch": "resnet34",
+      "dataset": "cifar10",
+      "noise_rate": 0.0,
+      "seed": 3,
+      "final_eval": {
+        "val_loss": 0.22454848613739015,
+        "val_acc": 0.9363
+      },
+      "wallclock_s": 3165.215031104861,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar10_noise=0.00_seed=4",
+      "arch": "resnet34",
+      "dataset": "cifar10",
+      "noise_rate": 0.0,
+      "seed": 4,
+      "final_eval": {
+        "val_loss": 0.2280063636302948,
+        "val_acc": 0.9324
+      },
+      "wallclock_s": 3129.262871474959,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar10_noise=0.00_seed=5",
+      "arch": "resnet34",
+      "dataset": "cifar10",
+      "noise_rate": 0.0,
+      "seed": 5,
+      "final_eval": {
+        "val_loss": 0.23642606635093688,
+        "val_acc": 0.9329
+      },
+      "wallclock_s": 3122.936993235955,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar10_noise=0.00_seed=6",
+      "arch": "resnet34",
+      "dataset": "cifar10",
+      "noise_rate": 0.0,
+      "seed": 6,
+      "final_eval": {
+        "val_loss": 0.24493696737289428,
+        "val_acc": 0.9287
+      },
+      "wallclock_s": 3272.330316497013,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar10_noise=0.00_seed=7",
+      "arch": "resnet34",
+      "dataset": "cifar10",
+      "noise_rate": 0.0,
+      "seed": 7,
+      "final_eval": {
+        "val_loss": 0.23463794374465943,
+        "val_acc": 0.9358
+      },
+      "wallclock_s": 3264.2879109289497,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar10_noise=0.00_seed=8",
+      "arch": "resnet34",
+      "dataset": "cifar10",
+      "noise_rate": 0.0,
+      "seed": 8,
+      "final_eval": {
+        "val_loss": 0.24854787392616273,
+        "val_acc": 0.9323
+      },
+      "wallclock_s": 3163.982737035025,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar10_noise=0.00_seed=9",
+      "arch": "resnet34",
+      "dataset": "cifar10",
+      "noise_rate": 0.0,
+      "seed": 9,
+      "final_eval": {
+        "val_loss": 0.23597336649894715,
+        "val_acc": 0.9339
+      },
+      "wallclock_s": 3157.3728391008917,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar10_noise=0.25_seed=0",
+      "arch": "resnet34",
+      "dataset": "cifar10",
+      "noise_rate": 0.25,
+      "seed": 0,
+      "final_eval": {
+        "val_loss": 0.5694037523269654,
+        "val_acc": 0.8743
+      },
+      "wallclock_s": 3146.5490204060916,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar10_noise=0.25_seed=1",
+      "arch": "resnet34",
+      "dataset": "cifar10",
+      "noise_rate": 0.25,
+      "seed": 1,
+      "final_eval": {
+        "val_loss": 0.5544862564086914,
+        "val_acc": 0.8779
+      },
+      "wallclock_s": 3142.0952844740823,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar10_noise=0.25_seed=2",
+      "arch": "resnet34",
+      "dataset": "cifar10",
+      "noise_rate": 0.25,
+      "seed": 2,
+      "final_eval": {
+        "val_loss": 0.5431198890209198,
+        "val_acc": 0.8838
+      },
+      "wallclock_s": 3244.6063285968266,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar10_noise=0.25_seed=3",
+      "arch": "resnet34",
+      "dataset": "cifar10",
+      "noise_rate": 0.25,
+      "seed": 3,
+      "final_eval": {
+        "val_loss": 0.5673853938102722,
+        "val_acc": 0.8732
+      },
+      "wallclock_s": 3243.1431639778893,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar10_noise=0.25_seed=4",
+      "arch": "resnet34",
+      "dataset": "cifar10",
+      "noise_rate": 0.25,
+      "seed": 4,
+      "final_eval": {
+        "val_loss": 0.5731351144313812,
+        "val_acc": 0.8748
+      },
+      "wallclock_s": 3100.1119005351793,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar10_noise=0.25_seed=5",
+      "arch": "resnet34",
+      "dataset": "cifar10",
+      "noise_rate": 0.25,
+      "seed": 5,
+      "final_eval": {
+        "val_loss": 0.5554405136108398,
+        "val_acc": 0.8802
+      },
+      "wallclock_s": 3100.0427646290045,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar10_noise=0.25_seed=6",
+      "arch": "resnet34",
+      "dataset": "cifar10",
+      "noise_rate": 0.25,
+      "seed": 6,
+      "final_eval": {
+        "val_loss": 0.5528185826301575,
+        "val_acc": 0.8826
+      },
+      "wallclock_s": 3296.4886266312096,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar10_noise=0.25_seed=7",
+      "arch": "resnet34",
+      "dataset": "cifar10",
+      "noise_rate": 0.25,
+      "seed": 7,
+      "final_eval": {
+        "val_loss": 0.5786655633926392,
+        "val_acc": 0.8674
+      },
+      "wallclock_s": 3270.2637654240243,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar10_noise=0.25_seed=8",
+      "arch": "resnet34",
+      "dataset": "cifar10",
+      "noise_rate": 0.25,
+      "seed": 8,
+      "final_eval": {
+        "val_loss": 0.5511624668598175,
+        "val_acc": 0.8833
+      },
+      "wallclock_s": 3132.8907738488633,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar10_noise=0.25_seed=9",
+      "arch": "resnet34",
+      "dataset": "cifar10",
+      "noise_rate": 0.25,
+      "seed": 9,
+      "final_eval": {
+        "val_loss": 0.5813020693778992,
+        "val_acc": 0.8698
+      },
+      "wallclock_s": 3128.442362761125,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar10_noise=0.40_seed=0",
+      "arch": "resnet34",
+      "dataset": "cifar10",
+      "noise_rate": 0.4,
+      "seed": 0,
+      "final_eval": {
+        "val_loss": 0.8018280918121338,
+        "val_acc": 0.8443
+      },
+      "wallclock_s": 3171.068331365008,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar10_noise=0.40_seed=1",
+      "arch": "resnet34",
+      "dataset": "cifar10",
+      "noise_rate": 0.4,
+      "seed": 1,
+      "final_eval": {
+        "val_loss": 0.7852833092689514,
+        "val_acc": 0.8523
+      },
+      "wallclock_s": 3169.732420109911,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar10_noise=0.40_seed=2",
+      "arch": "resnet34",
+      "dataset": "cifar10",
+      "noise_rate": 0.4,
+      "seed": 2,
+      "final_eval": {
+        "val_loss": 0.7765562795639038,
+        "val_acc": 0.8481
+      },
+      "wallclock_s": 3267.1034022038803,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar10_noise=0.40_seed=3",
+      "arch": "resnet34",
+      "dataset": "cifar10",
+      "noise_rate": 0.4,
+      "seed": 3,
+      "final_eval": {
+        "val_loss": 0.8218962370872498,
+        "val_acc": 0.8389
+      },
+      "wallclock_s": 3255.4196584241,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar10_noise=0.40_seed=4",
+      "arch": "resnet34",
+      "dataset": "cifar10",
+      "noise_rate": 0.4,
+      "seed": 4,
+      "final_eval": {
+        "val_loss": 0.7860993246078491,
+        "val_acc": 0.849
+      },
+      "wallclock_s": 3131.9690843499266,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar10_noise=0.40_seed=5",
+      "arch": "resnet34",
+      "dataset": "cifar10",
+      "noise_rate": 0.4,
+      "seed": 5,
+      "final_eval": {
+        "val_loss": 0.8049745977401733,
+        "val_acc": 0.8464
+      },
+      "wallclock_s": 3127.1213288530707,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar10_noise=0.40_seed=6",
+      "arch": "resnet34",
+      "dataset": "cifar10",
+      "noise_rate": 0.4,
+      "seed": 6,
+      "final_eval": {
+        "val_loss": 0.7948131567001343,
+        "val_acc": 0.8467
+      },
+      "wallclock_s": 3159.3724967190064,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar10_noise=0.40_seed=7",
+      "arch": "resnet34",
+      "dataset": "cifar10",
+      "noise_rate": 0.4,
+      "seed": 7,
+      "final_eval": {
+        "val_loss": 0.7730514798164367,
+        "val_acc": 0.8567
+      },
+      "wallclock_s": 3190.3424260257743,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar10_noise=0.40_seed=8",
+      "arch": "resnet34",
+      "dataset": "cifar10",
+      "noise_rate": 0.4,
+      "seed": 8,
+      "final_eval": {
+        "val_loss": 0.7992030662059784,
+        "val_acc": 0.8405
+      },
+      "wallclock_s": 3279.826053733006,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar10_noise=0.40_seed=9",
+      "arch": "resnet34",
+      "dataset": "cifar10",
+      "noise_rate": 0.4,
+      "seed": 9,
+      "final_eval": {
+        "val_loss": 0.7900704200744629,
+        "val_acc": 0.8553
+      },
+      "wallclock_s": 3267.529952605022,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar10_noise=0.60_seed=0",
+      "arch": "resnet34",
+      "dataset": "cifar10",
+      "noise_rate": 0.6,
+      "seed": 0,
+      "final_eval": {
+        "val_loss": 1.214817512512207,
+        "val_acc": 0.7899
+      },
+      "wallclock_s": 3135.7060083148535,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar10_noise=0.60_seed=1",
+      "arch": "resnet34",
+      "dataset": "cifar10",
+      "noise_rate": 0.6,
+      "seed": 1,
+      "final_eval": {
+        "val_loss": 1.2849901287078858,
+        "val_acc": 0.7601
+      },
+      "wallclock_s": 3131.5975055799354,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar10_noise=0.60_seed=2",
+      "arch": "resnet34",
+      "dataset": "cifar10",
+      "noise_rate": 0.6,
+      "seed": 2,
+      "final_eval": {
+        "val_loss": 1.307050993347168,
+        "val_acc": 0.7543
+      },
+      "wallclock_s": 3134.6718606769573,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar10_noise=0.60_seed=3",
+      "arch": "resnet34",
+      "dataset": "cifar10",
+      "noise_rate": 0.6,
+      "seed": 3,
+      "final_eval": {
+        "val_loss": 1.394788452720642,
+        "val_acc": 0.7012
+      },
+      "wallclock_s": 3135.025238509057,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar10_noise=0.60_seed=4",
+      "arch": "resnet34",
+      "dataset": "cifar10",
+      "noise_rate": 0.6,
+      "seed": 4,
+      "final_eval": {
+        "val_loss": 1.265150475883484,
+        "val_acc": 0.7713
+      },
+      "wallclock_s": 3240.823193473043,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar10_noise=0.60_seed=5",
+      "arch": "resnet34",
+      "dataset": "cifar10",
+      "noise_rate": 0.6,
+      "seed": 5,
+      "final_eval": {
+        "val_loss": 1.3073239389419555,
+        "val_acc": 0.7446
+      },
+      "wallclock_s": 3238.4759390009567,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar10_noise=0.60_seed=6",
+      "arch": "resnet34",
+      "dataset": "cifar10",
+      "noise_rate": 0.6,
+      "seed": 6,
+      "final_eval": {
+        "val_loss": 1.2509171985626222,
+        "val_acc": 0.7791
+      },
+      "wallclock_s": 3128.79048496997,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar10_noise=0.60_seed=7",
+      "arch": "resnet34",
+      "dataset": "cifar10",
+      "noise_rate": 0.6,
+      "seed": 7,
+      "final_eval": {
+        "val_loss": 1.314553236579895,
+        "val_acc": 0.7488
+      },
+      "wallclock_s": 3124.4807956528384,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar10_noise=0.60_seed=8",
+      "arch": "resnet34",
+      "dataset": "cifar10",
+      "noise_rate": 0.6,
+      "seed": 8,
+      "final_eval": {
+        "val_loss": 1.3360082822799682,
+        "val_acc": 0.7339
+      },
+      "wallclock_s": 3146.5615331481677,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=resnet34_dataset=cifar10_noise=0.60_seed=9",
+      "arch": "resnet34",
+      "dataset": "cifar10",
+      "noise_rate": 0.6,
+      "seed": 9,
+      "final_eval": {
+        "val_loss": 1.3643749557495117,
+        "val_acc": 0.7213
+      },
+      "wallclock_s": 3141.792229695013,
+      "n_layers": 73
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar100_noise=0.00_seed=0",
+      "arch": "vgg11",
+      "dataset": "cifar100",
+      "noise_rate": 0.0,
+      "seed": 0,
+      "final_eval": {
+        "val_loss": 1.3217113677978516,
+        "val_acc": 0.6674
+      },
+      "wallclock_s": 586.8458978009876,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar100_noise=0.00_seed=1",
+      "arch": "vgg11",
+      "dataset": "cifar100",
+      "noise_rate": 0.0,
+      "seed": 1,
+      "final_eval": {
+        "val_loss": 1.3533178909301757,
+        "val_acc": 0.6663
+      },
+      "wallclock_s": 587.5176287200302,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar100_noise=0.00_seed=10",
+      "arch": "vgg11",
+      "dataset": "cifar100",
+      "noise_rate": 0.0,
+      "seed": 10,
+      "final_eval": {
+        "val_loss": 1.3053089866638183,
+        "val_acc": 0.6739
+      },
+      "wallclock_s": 461.49107409710996,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar100_noise=0.00_seed=11",
+      "arch": "vgg11",
+      "dataset": "cifar100",
+      "noise_rate": 0.0,
+      "seed": 11,
+      "final_eval": {
+        "val_loss": 1.282940752220154,
+        "val_acc": 0.6765
+      },
+      "wallclock_s": 454.9901254309807,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar100_noise=0.00_seed=12",
+      "arch": "vgg11",
+      "dataset": "cifar100",
+      "noise_rate": 0.0,
+      "seed": 12,
+      "final_eval": {
+        "val_loss": 1.3001894941329957,
+        "val_acc": 0.6741
+      },
+      "wallclock_s": 447.9181188910734,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar100_noise=0.00_seed=13",
+      "arch": "vgg11",
+      "dataset": "cifar100",
+      "noise_rate": 0.0,
+      "seed": 13,
+      "final_eval": {
+        "val_loss": 1.3035149878501893,
+        "val_acc": 0.6755
+      },
+      "wallclock_s": 435.0246648560278,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar100_noise=0.00_seed=14",
+      "arch": "vgg11",
+      "dataset": "cifar100",
+      "noise_rate": 0.0,
+      "seed": 14,
+      "final_eval": {
+        "val_loss": 1.3037273239135743,
+        "val_acc": 0.6735
+      },
+      "wallclock_s": 456.45850806101225,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar100_noise=0.00_seed=15",
+      "arch": "vgg11",
+      "dataset": "cifar100",
+      "noise_rate": 0.0,
+      "seed": 15,
+      "final_eval": {
+        "val_loss": 1.3024442893981933,
+        "val_acc": 0.6699
+      },
+      "wallclock_s": 1019.3802547659725,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar100_noise=0.00_seed=16",
+      "arch": "vgg11",
+      "dataset": "cifar100",
+      "noise_rate": 0.0,
+      "seed": 16,
+      "final_eval": {
+        "val_loss": 1.313232879447937,
+        "val_acc": 0.6754
+      },
+      "wallclock_s": 591.2685348489322,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar100_noise=0.00_seed=17",
+      "arch": "vgg11",
+      "dataset": "cifar100",
+      "noise_rate": 0.0,
+      "seed": 17,
+      "final_eval": {
+        "val_loss": 1.3031623641967773,
+        "val_acc": 0.6751
+      },
+      "wallclock_s": 589.2277133848984,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar100_noise=0.00_seed=18",
+      "arch": "vgg11",
+      "dataset": "cifar100",
+      "noise_rate": 0.0,
+      "seed": 18,
+      "final_eval": {
+        "val_loss": 1.292033916091919,
+        "val_acc": 0.6715
+      },
+      "wallclock_s": 581.0950886940118,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar100_noise=0.00_seed=19",
+      "arch": "vgg11",
+      "dataset": "cifar100",
+      "noise_rate": 0.0,
+      "seed": 19,
+      "final_eval": {
+        "val_loss": 1.3057776847839355,
+        "val_acc": 0.6755
+      },
+      "wallclock_s": 580.3092107200064,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar100_noise=0.00_seed=2",
+      "arch": "vgg11",
+      "dataset": "cifar100",
+      "noise_rate": 0.0,
+      "seed": 2,
+      "final_eval": {
+        "val_loss": 1.321661901664734,
+        "val_acc": 0.6718
+      },
+      "wallclock_s": 575.8718863530084,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar100_noise=0.00_seed=3",
+      "arch": "vgg11",
+      "dataset": "cifar100",
+      "noise_rate": 0.0,
+      "seed": 3,
+      "final_eval": {
+        "val_loss": 1.2850672925949096,
+        "val_acc": 0.6761
+      },
+      "wallclock_s": 576.4556127758697,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar100_noise=0.00_seed=4",
+      "arch": "vgg11",
+      "dataset": "cifar100",
+      "noise_rate": 0.0,
+      "seed": 4,
+      "final_eval": {
+        "val_loss": 1.308605904006958,
+        "val_acc": 0.6694
+      },
+      "wallclock_s": 591.4138063699938,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar100_noise=0.00_seed=5",
+      "arch": "vgg11",
+      "dataset": "cifar100",
+      "noise_rate": 0.0,
+      "seed": 5,
+      "final_eval": {
+        "val_loss": 1.2948366416931152,
+        "val_acc": 0.6702
+      },
+      "wallclock_s": 590.553812402999,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar100_noise=0.00_seed=6",
+      "arch": "vgg11",
+      "dataset": "cifar100",
+      "noise_rate": 0.0,
+      "seed": 6,
+      "final_eval": {
+        "val_loss": 1.300827423286438,
+        "val_acc": 0.6758
+      },
+      "wallclock_s": 586.6833840010222,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar100_noise=0.00_seed=7",
+      "arch": "vgg11",
+      "dataset": "cifar100",
+      "noise_rate": 0.0,
+      "seed": 7,
+      "final_eval": {
+        "val_loss": 1.308283275604248,
+        "val_acc": 0.6772
+      },
+      "wallclock_s": 587.0412543669809,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar100_noise=0.00_seed=8",
+      "arch": "vgg11",
+      "dataset": "cifar100",
+      "noise_rate": 0.0,
+      "seed": 8,
+      "final_eval": {
+        "val_loss": 1.3091852798461914,
+        "val_acc": 0.6706
+      },
+      "wallclock_s": 581.4305374941323,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar100_noise=0.00_seed=9",
+      "arch": "vgg11",
+      "dataset": "cifar100",
+      "noise_rate": 0.0,
+      "seed": 9,
+      "final_eval": {
+        "val_loss": 1.2993600770950318,
+        "val_acc": 0.6745
+      },
+      "wallclock_s": 580.648979627993,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar100_noise=0.25_seed=0",
+      "arch": "vgg11",
+      "dataset": "cifar100",
+      "noise_rate": 0.25,
+      "seed": 0,
+      "final_eval": {
+        "val_loss": 1.8939804319381714,
+        "val_acc": 0.571
+      },
+      "wallclock_s": 593.7384393950924,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar100_noise=0.25_seed=1",
+      "arch": "vgg11",
+      "dataset": "cifar100",
+      "noise_rate": 0.25,
+      "seed": 1,
+      "final_eval": {
+        "val_loss": 1.910036869239807,
+        "val_acc": 0.559
+      },
+      "wallclock_s": 592.9561595248524,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar100_noise=0.25_seed=2",
+      "arch": "vgg11",
+      "dataset": "cifar100",
+      "noise_rate": 0.25,
+      "seed": 2,
+      "final_eval": {
+        "val_loss": 1.8346903272628785,
+        "val_acc": 0.5731
+      },
+      "wallclock_s": 583.1045286171138,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar100_noise=0.25_seed=3",
+      "arch": "vgg11",
+      "dataset": "cifar100",
+      "noise_rate": 0.25,
+      "seed": 3,
+      "final_eval": {
+        "val_loss": 1.8692605562210083,
+        "val_acc": 0.5633
+      },
+      "wallclock_s": 576.5416249500122,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar100_noise=0.25_seed=4",
+      "arch": "vgg11",
+      "dataset": "cifar100",
+      "noise_rate": 0.25,
+      "seed": 4,
+      "final_eval": {
+        "val_loss": 1.8818957750320435,
+        "val_acc": 0.567
+      },
+      "wallclock_s": 573.8522930610925,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar100_noise=0.25_seed=5",
+      "arch": "vgg11",
+      "dataset": "cifar100",
+      "noise_rate": 0.25,
+      "seed": 5,
+      "final_eval": {
+        "val_loss": 1.8651956621170045,
+        "val_acc": 0.5663
+      },
+      "wallclock_s": 578.4900791740511,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar100_noise=0.25_seed=6",
+      "arch": "vgg11",
+      "dataset": "cifar100",
+      "noise_rate": 0.25,
+      "seed": 6,
+      "final_eval": {
+        "val_loss": 1.8756221298217775,
+        "val_acc": 0.5696
+      },
+      "wallclock_s": 593.4004856098909,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar100_noise=0.25_seed=7",
+      "arch": "vgg11",
+      "dataset": "cifar100",
+      "noise_rate": 0.25,
+      "seed": 7,
+      "final_eval": {
+        "val_loss": 1.877247982978821,
+        "val_acc": 0.5662
+      },
+      "wallclock_s": 593.0693208719604,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar100_noise=0.25_seed=8",
+      "arch": "vgg11",
+      "dataset": "cifar100",
+      "noise_rate": 0.25,
+      "seed": 8,
+      "final_eval": {
+        "val_loss": 1.8692049516677856,
+        "val_acc": 0.57
+      },
+      "wallclock_s": 582.2019323401619,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar100_noise=0.25_seed=9",
+      "arch": "vgg11",
+      "dataset": "cifar100",
+      "noise_rate": 0.25,
+      "seed": 9,
+      "final_eval": {
+        "val_loss": 1.9113404304504396,
+        "val_acc": 0.5588
+      },
+      "wallclock_s": 581.0356983081438,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar100_noise=0.40_seed=0",
+      "arch": "vgg11",
+      "dataset": "cifar100",
+      "noise_rate": 0.4,
+      "seed": 0,
+      "final_eval": {
+        "val_loss": 2.1757916618347166,
+        "val_acc": 0.5179
+      },
+      "wallclock_s": 590.6074680839665,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar100_noise=0.40_seed=1",
+      "arch": "vgg11",
+      "dataset": "cifar100",
+      "noise_rate": 0.4,
+      "seed": 1,
+      "final_eval": {
+        "val_loss": 2.1509356506347657,
+        "val_acc": 0.523
+      },
+      "wallclock_s": 589.4830960161053,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar100_noise=0.40_seed=2",
+      "arch": "vgg11",
+      "dataset": "cifar100",
+      "noise_rate": 0.4,
+      "seed": 2,
+      "final_eval": {
+        "val_loss": 2.197317354774475,
+        "val_acc": 0.516
+      },
+      "wallclock_s": 591.8976735610049,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar100_noise=0.40_seed=3",
+      "arch": "vgg11",
+      "dataset": "cifar100",
+      "noise_rate": 0.4,
+      "seed": 3,
+      "final_eval": {
+        "val_loss": 2.150988687133789,
+        "val_acc": 0.5269
+      },
+      "wallclock_s": 591.6456458680332,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar100_noise=0.40_seed=4",
+      "arch": "vgg11",
+      "dataset": "cifar100",
+      "noise_rate": 0.4,
+      "seed": 4,
+      "final_eval": {
+        "val_loss": 2.1867116233825685,
+        "val_acc": 0.5155
+      },
+      "wallclock_s": 593.2186202998273,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar100_noise=0.40_seed=5",
+      "arch": "vgg11",
+      "dataset": "cifar100",
+      "noise_rate": 0.4,
+      "seed": 5,
+      "final_eval": {
+        "val_loss": 2.1896673040390016,
+        "val_acc": 0.5127
+      },
+      "wallclock_s": 592.8896463029087,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar100_noise=0.40_seed=6",
+      "arch": "vgg11",
+      "dataset": "cifar100",
+      "noise_rate": 0.4,
+      "seed": 6,
+      "final_eval": {
+        "val_loss": 2.1522954769134524,
+        "val_acc": 0.5245
+      },
+      "wallclock_s": 589.2356912710238,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar100_noise=0.40_seed=7",
+      "arch": "vgg11",
+      "dataset": "cifar100",
+      "noise_rate": 0.4,
+      "seed": 7,
+      "final_eval": {
+        "val_loss": 2.14549234046936,
+        "val_acc": 0.5244
+      },
+      "wallclock_s": 587.1762255888898,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar100_noise=0.40_seed=8",
+      "arch": "vgg11",
+      "dataset": "cifar100",
+      "noise_rate": 0.4,
+      "seed": 8,
+      "final_eval": {
+        "val_loss": 2.187801914215088,
+        "val_acc": 0.519
+      },
+      "wallclock_s": 595.173007305013,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar100_noise=0.40_seed=9",
+      "arch": "vgg11",
+      "dataset": "cifar100",
+      "noise_rate": 0.4,
+      "seed": 9,
+      "final_eval": {
+        "val_loss": 2.1487892028808595,
+        "val_acc": 0.5224
+      },
+      "wallclock_s": 595.4264540779404,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar100_noise=0.60_seed=0",
+      "arch": "vgg11",
+      "dataset": "cifar100",
+      "noise_rate": 0.6,
+      "seed": 0,
+      "final_eval": {
+        "val_loss": 2.7631618988037108,
+        "val_acc": 0.4206
+      },
+      "wallclock_s": 587.3807943321299,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar100_noise=0.60_seed=1",
+      "arch": "vgg11",
+      "dataset": "cifar100",
+      "noise_rate": 0.6,
+      "seed": 1,
+      "final_eval": {
+        "val_loss": 2.75324868850708,
+        "val_acc": 0.411
+      },
+      "wallclock_s": 586.9889350379817,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar100_noise=0.60_seed=2",
+      "arch": "vgg11",
+      "dataset": "cifar100",
+      "noise_rate": 0.6,
+      "seed": 2,
+      "final_eval": {
+        "val_loss": 2.8259998527526857,
+        "val_acc": 0.4036
+      },
+      "wallclock_s": 573.7061843168922,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar100_noise=0.60_seed=3",
+      "arch": "vgg11",
+      "dataset": "cifar100",
+      "noise_rate": 0.6,
+      "seed": 3,
+      "final_eval": {
+        "val_loss": 2.7563353145599367,
+        "val_acc": 0.4283
+      },
+      "wallclock_s": 573.3375265479553,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar100_noise=0.60_seed=4",
+      "arch": "vgg11",
+      "dataset": "cifar100",
+      "noise_rate": 0.6,
+      "seed": 4,
+      "final_eval": {
+        "val_loss": 2.826752519226074,
+        "val_acc": 0.4006
+      },
+      "wallclock_s": 589.6612809048966,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar100_noise=0.60_seed=5",
+      "arch": "vgg11",
+      "dataset": "cifar100",
+      "noise_rate": 0.6,
+      "seed": 5,
+      "final_eval": {
+        "val_loss": 2.803876798248291,
+        "val_acc": 0.4086
+      },
+      "wallclock_s": 589.4004745699931,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar100_noise=0.60_seed=6",
+      "arch": "vgg11",
+      "dataset": "cifar100",
+      "noise_rate": 0.6,
+      "seed": 6,
+      "final_eval": {
+        "val_loss": 2.7935049236297607,
+        "val_acc": 0.4124
+      },
+      "wallclock_s": 588.9229890590068,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar100_noise=0.60_seed=7",
+      "arch": "vgg11",
+      "dataset": "cifar100",
+      "noise_rate": 0.6,
+      "seed": 7,
+      "final_eval": {
+        "val_loss": 2.780270405960083,
+        "val_acc": 0.4152
+      },
+      "wallclock_s": 588.6392664639279,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar100_noise=0.60_seed=8",
+      "arch": "vgg11",
+      "dataset": "cifar100",
+      "noise_rate": 0.6,
+      "seed": 8,
+      "final_eval": {
+        "val_loss": 2.816596144104004,
+        "val_acc": 0.414
+      },
+      "wallclock_s": 571.5111603029072,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar100_noise=0.60_seed=9",
+      "arch": "vgg11",
+      "dataset": "cifar100",
+      "noise_rate": 0.6,
+      "seed": 9,
+      "final_eval": {
+        "val_loss": 2.9859584907531738,
+        "val_acc": 0.3644
+      },
+      "wallclock_s": 571.0744840509724,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar10_noise=0.00_seed=0",
+      "arch": "vgg11",
+      "dataset": "cifar10",
+      "noise_rate": 0.0,
+      "seed": 0,
+      "final_eval": {
+        "val_loss": 0.3282358492851257,
+        "val_acc": 0.8997
+      },
+      "wallclock_s": 555.2964583989233,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar10_noise=0.00_seed=1",
+      "arch": "vgg11",
+      "dataset": "cifar10",
+      "noise_rate": 0.0,
+      "seed": 1,
+      "final_eval": {
+        "val_loss": 0.3321473704338074,
+        "val_acc": 0.8948
+      },
+      "wallclock_s": 554.2544471209403,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar10_noise=0.00_seed=10",
+      "arch": "vgg11",
+      "dataset": "cifar10",
+      "noise_rate": 0.0,
+      "seed": 10,
+      "final_eval": {
+        "val_loss": 0.321828472328186,
+        "val_acc": 0.9003
+      },
+      "wallclock_s": 1330.558543926105,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar10_noise=0.00_seed=11",
+      "arch": "vgg11",
+      "dataset": "cifar10",
+      "noise_rate": 0.0,
+      "seed": 11,
+      "final_eval": {
+        "val_loss": 0.3567821963787079,
+        "val_acc": 0.8896
+      },
+      "wallclock_s": 1333.0227321460843,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar10_noise=0.00_seed=12",
+      "arch": "vgg11",
+      "dataset": "cifar10",
+      "noise_rate": 0.0,
+      "seed": 12,
+      "final_eval": {
+        "val_loss": 0.33197015237808225,
+        "val_acc": 0.8982
+      },
+      "wallclock_s": 573.627594034886,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar10_noise=0.00_seed=13",
+      "arch": "vgg11",
+      "dataset": "cifar10",
+      "noise_rate": 0.0,
+      "seed": 13,
+      "final_eval": {
+        "val_loss": 0.338981659412384,
+        "val_acc": 0.8954
+      },
+      "wallclock_s": 572.7181493879762,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar10_noise=0.00_seed=14",
+      "arch": "vgg11",
+      "dataset": "cifar10",
+      "noise_rate": 0.0,
+      "seed": 14,
+      "final_eval": {
+        "val_loss": 0.326659530043602,
+        "val_acc": 0.8971
+      },
+      "wallclock_s": 576.1552632460371,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar10_noise=0.00_seed=15",
+      "arch": "vgg11",
+      "dataset": "cifar10",
+      "noise_rate": 0.0,
+      "seed": 15,
+      "final_eval": {
+        "val_loss": 0.32324759426116945,
+        "val_acc": 0.902
+      },
+      "wallclock_s": 575.2966459169984,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar10_noise=0.00_seed=16",
+      "arch": "vgg11",
+      "dataset": "cifar10",
+      "noise_rate": 0.0,
+      "seed": 16,
+      "final_eval": {
+        "val_loss": 0.33347580757141115,
+        "val_acc": 0.8986
+      },
+      "wallclock_s": 455.33053273218684,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar10_noise=0.00_seed=17",
+      "arch": "vgg11",
+      "dataset": "cifar10",
+      "noise_rate": 0.0,
+      "seed": 17,
+      "final_eval": {
+        "val_loss": 0.3305315489292145,
+        "val_acc": 0.8975
+      },
+      "wallclock_s": 1019.1950585250743,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar10_noise=0.00_seed=18",
+      "arch": "vgg11",
+      "dataset": "cifar10",
+      "noise_rate": 0.0,
+      "seed": 18,
+      "final_eval": {
+        "val_loss": 0.317424272441864,
+        "val_acc": 0.8994
+      },
+      "wallclock_s": 455.59630511701107,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar10_noise=0.00_seed=19",
+      "arch": "vgg11",
+      "dataset": "cifar10",
+      "noise_rate": 0.0,
+      "seed": 19,
+      "final_eval": {
+        "val_loss": 0.3353098202466965,
+        "val_acc": 0.8975
+      },
+      "wallclock_s": 426.24643692187965,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar10_noise=0.00_seed=2",
+      "arch": "vgg11",
+      "dataset": "cifar10",
+      "noise_rate": 0.0,
+      "seed": 2,
+      "final_eval": {
+        "val_loss": 0.3466595236301422,
+        "val_acc": 0.8926
+      },
+      "wallclock_s": 557.3261533291079,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar10_noise=0.00_seed=3",
+      "arch": "vgg11",
+      "dataset": "cifar10",
+      "noise_rate": 0.0,
+      "seed": 3,
+      "final_eval": {
+        "val_loss": 0.34211461400985715,
+        "val_acc": 0.8971
+      },
+      "wallclock_s": 557.6394056589343,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar10_noise=0.00_seed=4",
+      "arch": "vgg11",
+      "dataset": "cifar10",
+      "noise_rate": 0.0,
+      "seed": 4,
+      "final_eval": {
+        "val_loss": 0.35188250608444216,
+        "val_acc": 0.8922
+      },
+      "wallclock_s": 570.8980771158822,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar10_noise=0.00_seed=5",
+      "arch": "vgg11",
+      "dataset": "cifar10",
+      "noise_rate": 0.0,
+      "seed": 5,
+      "final_eval": {
+        "val_loss": 0.3336037886142731,
+        "val_acc": 0.901
+      },
+      "wallclock_s": 570.032456506975,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar10_noise=0.00_seed=6",
+      "arch": "vgg11",
+      "dataset": "cifar10",
+      "noise_rate": 0.0,
+      "seed": 6,
+      "final_eval": {
+        "val_loss": 0.31643576250076294,
+        "val_acc": 0.9049
+      },
+      "wallclock_s": 566.2812121328898,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar10_noise=0.00_seed=7",
+      "arch": "vgg11",
+      "dataset": "cifar10",
+      "noise_rate": 0.0,
+      "seed": 7,
+      "final_eval": {
+        "val_loss": 0.3280044374704361,
+        "val_acc": 0.9006
+      },
+      "wallclock_s": 566.5894773090258,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar10_noise=0.00_seed=8",
+      "arch": "vgg11",
+      "dataset": "cifar10",
+      "noise_rate": 0.0,
+      "seed": 8,
+      "final_eval": {
+        "val_loss": 0.329569406414032,
+        "val_acc": 0.8994
+      },
+      "wallclock_s": 574.7040032539517,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar10_noise=0.00_seed=9",
+      "arch": "vgg11",
+      "dataset": "cifar10",
+      "noise_rate": 0.0,
+      "seed": 9,
+      "final_eval": {
+        "val_loss": 0.3388197028696537,
+        "val_acc": 0.8973
+      },
+      "wallclock_s": 575.0152622289024,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar10_noise=0.25_seed=0",
+      "arch": "vgg11",
+      "dataset": "cifar10",
+      "noise_rate": 0.25,
+      "seed": 0,
+      "final_eval": {
+        "val_loss": 0.6417880792140961,
+        "val_acc": 0.848
+      },
+      "wallclock_s": 571.6917275011074,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar10_noise=0.25_seed=1",
+      "arch": "vgg11",
+      "dataset": "cifar10",
+      "noise_rate": 0.25,
+      "seed": 1,
+      "final_eval": {
+        "val_loss": 0.6598967172145843,
+        "val_acc": 0.8423
+      },
+      "wallclock_s": 572.0887651331723,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar10_noise=0.25_seed=2",
+      "arch": "vgg11",
+      "dataset": "cifar10",
+      "noise_rate": 0.25,
+      "seed": 2,
+      "final_eval": {
+        "val_loss": 0.6397298886775971,
+        "val_acc": 0.8492
+      },
+      "wallclock_s": 576.4990378441289,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar10_noise=0.25_seed=3",
+      "arch": "vgg11",
+      "dataset": "cifar10",
+      "noise_rate": 0.25,
+      "seed": 3,
+      "final_eval": {
+        "val_loss": 0.6560133499145507,
+        "val_acc": 0.8424
+      },
+      "wallclock_s": 574.5500055360608,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar10_noise=0.25_seed=4",
+      "arch": "vgg11",
+      "dataset": "cifar10",
+      "noise_rate": 0.25,
+      "seed": 4,
+      "final_eval": {
+        "val_loss": 0.6454714507102967,
+        "val_acc": 0.8479
+      },
+      "wallclock_s": 590.5688983290456,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar10_noise=0.25_seed=5",
+      "arch": "vgg11",
+      "dataset": "cifar10",
+      "noise_rate": 0.25,
+      "seed": 5,
+      "final_eval": {
+        "val_loss": 0.641276470565796,
+        "val_acc": 0.8491
+      },
+      "wallclock_s": 589.343364099972,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar10_noise=0.25_seed=6",
+      "arch": "vgg11",
+      "dataset": "cifar10",
+      "noise_rate": 0.25,
+      "seed": 6,
+      "final_eval": {
+        "val_loss": 0.648741745853424,
+        "val_acc": 0.8469
+      },
+      "wallclock_s": 580.6105106179602,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar10_noise=0.25_seed=7",
+      "arch": "vgg11",
+      "dataset": "cifar10",
+      "noise_rate": 0.25,
+      "seed": 7,
+      "final_eval": {
+        "val_loss": 0.6421483236312866,
+        "val_acc": 0.8455
+      },
+      "wallclock_s": 579.313661157852,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar10_noise=0.25_seed=8",
+      "arch": "vgg11",
+      "dataset": "cifar10",
+      "noise_rate": 0.25,
+      "seed": 8,
+      "final_eval": {
+        "val_loss": 0.6541882881164551,
+        "val_acc": 0.8455
+      },
+      "wallclock_s": 581.8837926478591,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar10_noise=0.25_seed=9",
+      "arch": "vgg11",
+      "dataset": "cifar10",
+      "noise_rate": 0.25,
+      "seed": 9,
+      "final_eval": {
+        "val_loss": 0.6448903337478638,
+        "val_acc": 0.8437
+      },
+      "wallclock_s": 581.8347976340447,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar10_noise=0.40_seed=0",
+      "arch": "vgg11",
+      "dataset": "cifar10",
+      "noise_rate": 0.4,
+      "seed": 0,
+      "final_eval": {
+        "val_loss": 0.897387407875061,
+        "val_acc": 0.8062
+      },
+      "wallclock_s": 594.4103216370568,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar10_noise=0.40_seed=1",
+      "arch": "vgg11",
+      "dataset": "cifar10",
+      "noise_rate": 0.4,
+      "seed": 1,
+      "final_eval": {
+        "val_loss": 0.8897838218688965,
+        "val_acc": 0.8171
+      },
+      "wallclock_s": 594.9120655108709,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar10_noise=0.40_seed=2",
+      "arch": "vgg11",
+      "dataset": "cifar10",
+      "noise_rate": 0.4,
+      "seed": 2,
+      "final_eval": {
+        "val_loss": 0.8655972654342652,
+        "val_acc": 0.8167
+      },
+      "wallclock_s": 582.5285549580585,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar10_noise=0.40_seed=3",
+      "arch": "vgg11",
+      "dataset": "cifar10",
+      "noise_rate": 0.4,
+      "seed": 3,
+      "final_eval": {
+        "val_loss": 0.882331143951416,
+        "val_acc": 0.8138
+      },
+      "wallclock_s": 578.6991782819387,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar10_noise=0.40_seed=4",
+      "arch": "vgg11",
+      "dataset": "cifar10",
+      "noise_rate": 0.4,
+      "seed": 4,
+      "final_eval": {
+        "val_loss": 0.8761676648139953,
+        "val_acc": 0.8104
+      },
+      "wallclock_s": 573.3577117191162,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar10_noise=0.40_seed=5",
+      "arch": "vgg11",
+      "dataset": "cifar10",
+      "noise_rate": 0.4,
+      "seed": 5,
+      "final_eval": {
+        "val_loss": 0.8777461092948914,
+        "val_acc": 0.8159
+      },
+      "wallclock_s": 573.3978421010543,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar10_noise=0.40_seed=6",
+      "arch": "vgg11",
+      "dataset": "cifar10",
+      "noise_rate": 0.4,
+      "seed": 6,
+      "final_eval": {
+        "val_loss": 0.8801166299819946,
+        "val_acc": 0.8148
+      },
+      "wallclock_s": 583.9997387409676,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar10_noise=0.40_seed=7",
+      "arch": "vgg11",
+      "dataset": "cifar10",
+      "noise_rate": 0.4,
+      "seed": 7,
+      "final_eval": {
+        "val_loss": 0.8759900602340698,
+        "val_acc": 0.8124
+      },
+      "wallclock_s": 583.8091927058995,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar10_noise=0.40_seed=8",
+      "arch": "vgg11",
+      "dataset": "cifar10",
+      "noise_rate": 0.4,
+      "seed": 8,
+      "final_eval": {
+        "val_loss": 0.8815134752273559,
+        "val_acc": 0.8124
+      },
+      "wallclock_s": 590.3681226640474,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar10_noise=0.40_seed=9",
+      "arch": "vgg11",
+      "dataset": "cifar10",
+      "noise_rate": 0.4,
+      "seed": 9,
+      "final_eval": {
+        "val_loss": 0.8773556391716003,
+        "val_acc": 0.8119
+      },
+      "wallclock_s": 590.343532507075,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar10_noise=0.60_seed=0",
+      "arch": "vgg11",
+      "dataset": "cifar10",
+      "noise_rate": 0.6,
+      "seed": 0,
+      "final_eval": {
+        "val_loss": 1.3276942302703858,
+        "val_acc": 0.7409
+      },
+      "wallclock_s": 578.0652491201181,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar10_noise=0.60_seed=1",
+      "arch": "vgg11",
+      "dataset": "cifar10",
+      "noise_rate": 0.6,
+      "seed": 1,
+      "final_eval": {
+        "val_loss": 1.3275945323944092,
+        "val_acc": 0.7413
+      },
+      "wallclock_s": 579.1307402558159,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar10_noise=0.60_seed=2",
+      "arch": "vgg11",
+      "dataset": "cifar10",
+      "noise_rate": 0.6,
+      "seed": 2,
+      "final_eval": {
+        "val_loss": 1.3142498229980468,
+        "val_acc": 0.7468
+      },
+      "wallclock_s": 588.4628469750751,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar10_noise=0.60_seed=3",
+      "arch": "vgg11",
+      "dataset": "cifar10",
+      "noise_rate": 0.6,
+      "seed": 3,
+      "final_eval": {
+        "val_loss": 1.3296690708160401,
+        "val_acc": 0.7416
+      },
+      "wallclock_s": 588.50449428102,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar10_noise=0.60_seed=4",
+      "arch": "vgg11",
+      "dataset": "cifar10",
+      "noise_rate": 0.6,
+      "seed": 4,
+      "final_eval": {
+        "val_loss": 1.349185718536377,
+        "val_acc": 0.732
+      },
+      "wallclock_s": 576.351936015999,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar10_noise=0.60_seed=5",
+      "arch": "vgg11",
+      "dataset": "cifar10",
+      "noise_rate": 0.6,
+      "seed": 5,
+      "final_eval": {
+        "val_loss": 1.3336155256271363,
+        "val_acc": 0.745
+      },
+      "wallclock_s": 575.7407063150313,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar10_noise=0.60_seed=6",
+      "arch": "vgg11",
+      "dataset": "cifar10",
+      "noise_rate": 0.6,
+      "seed": 6,
+      "final_eval": {
+        "val_loss": 1.3538547761917115,
+        "val_acc": 0.741
+      },
+      "wallclock_s": 577.4384603379294,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar10_noise=0.60_seed=7",
+      "arch": "vgg11",
+      "dataset": "cifar10",
+      "noise_rate": 0.6,
+      "seed": 7,
+      "final_eval": {
+        "val_loss": 1.344855110168457,
+        "val_acc": 0.7379
+      },
+      "wallclock_s": 576.966994289076,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar10_noise=0.60_seed=8",
+      "arch": "vgg11",
+      "dataset": "cifar10",
+      "noise_rate": 0.6,
+      "seed": 8,
+      "final_eval": {
+        "val_loss": 1.3139277688980102,
+        "val_acc": 0.7443
+      },
+      "wallclock_s": 589.3964623450302,
+      "n_layers": 17
+    },
+    {
+      "run_dir": "arch=vgg11_dataset=cifar10_noise=0.60_seed=9",
+      "arch": "vgg11",
+      "dataset": "cifar10",
+      "noise_rate": 0.6,
+      "seed": 9,
+      "final_eval": {
+        "val_loss": 1.3468902355194092,
+        "val_acc": 0.7362
+      },
+      "wallclock_s": 589.4206848300528,
+      "n_layers": 17
+    }
+  ]
+}

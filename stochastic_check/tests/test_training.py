@@ -34,6 +34,7 @@ class _RecordingEstimator(TraceEstimator):
     name = "recording"
 
     def __init__(self) -> None:
+        """Initialize captured inputs without affecting estimator randomness."""
         self.last_x: torch.Tensor | None = None
         self.last_y: torch.Tensor | None = None
 
@@ -45,6 +46,7 @@ class _RecordingEstimator(TraceEstimator):
         y: torch.Tensor,
         loss_fn: LossFn,  # noqa: ARG002 - probe sink does not need the loss
     ) -> dict[str, float]:
+        """Capture the supplied batch and return zero traces for the test."""
         self.last_x = x.detach().cpu().clone()
         self.last_y = y.detach().cpu().clone()
         return {layer.name: 0.0 for layer in layers}
@@ -57,15 +59,14 @@ def _sentinel_loader(
     n: int = 32,
     batch_size: int = 16,
 ) -> DataLoader:
-    """A loader whose every sample is the constant ``value`` with class
-    ``label`` -- lets a test distinguish the train and val sources by
-    inspection alone."""
+    """Build a constant-input loader whose source is visible in the captured batch."""
     x = torch.full((n, 3, 4, 4), value, dtype=torch.float32)
     y = torch.full((n,), label, dtype=torch.long)
     return DataLoader(TensorDataset(x, y), batch_size=batch_size, shuffle=False)
 
 
 def _build_trainer(train_loader: DataLoader, val_loader: DataLoader) -> Trainer:
+    """Construct a minimal CPU trainer for measurement behavior checks."""
     model = nn.Sequential(nn.Flatten(), nn.Linear(3 * 4 * 4, 2))
     return Trainer(
         model=model,
@@ -89,12 +90,10 @@ def _build_trainer(train_loader: DataLoader, val_loader: DataLoader) -> Trainer:
 
 
 def test_measure_trace_samples_from_train_loader() -> None:
-    """Regression: the HVP batch must come from ``train_loader`` (noisy
-    labels, augmented inputs), not from ``val_loader``.
+    """Keep HVP inputs on the noisy, augmented training distribution.
 
-    A loader mix-up here silently invalidates every experiment-B claim:
-    the per-step trace trajectory becomes a function of held-out clean
-    labels instead of the training noise regime.
+    Using held-out validation labels would disconnect the measured
+    trajectory from the training noise regime.
     """
     train_loader = _sentinel_loader(value=1.0, label=0)
     val_loader = _sentinel_loader(value=0.0, label=1)
@@ -107,12 +106,12 @@ def test_measure_trace_samples_from_train_loader() -> None:
 
     assert recorder.last_x is not None
     assert recorder.last_y is not None
-    assert torch.all(
-        recorder.last_x == 1.0
-    ), "HVP inputs must come from train_loader (value=1), got val (value=0)."
-    assert torch.all(
-        recorder.last_y == 0
-    ), "HVP labels must come from train_loader (label=0), got val (label=1)."
+    assert torch.all(recorder.last_x == 1.0), (
+        "HVP inputs must come from train_loader (value=1), got val (value=0)."
+    )
+    assert torch.all(recorder.last_y == 0), (
+        "HVP labels must come from train_loader (label=0), got val (label=1)."
+    )
 
 
 def test_measure_trace_restores_train_mode() -> None:
@@ -138,19 +137,15 @@ def test_measure_trace_restores_train_mode() -> None:
 
 
 def test_measure_trace_preserves_train_loader_shuffling() -> None:
-    """Regression: ``measure_trace`` must not consume ``train_loader``'s
-    shuffling RNG.
+    """Preserve future training-batch order across a trace measurement.
 
-    If the HVP batch were drawn directly from ``train_loader``, each
-    ``measure_trace`` call would advance the shared sampler generator
-    and the order of training batches in subsequent epochs would
-    silently depend on ``metric_interval_steps``.  We assert that the
-    sequence of training batches is identical with and without an
-    intervening trace measurement.
+    Advancing the training sampler during HVP measurement would make later
+    epochs depend on the measurement interval.
     """
     n, batch_size = 64, 8
 
     def _shuffled_loader(seed: int) -> DataLoader:
+        """Create observable sample identities with an independent shuffle RNG."""
         # Distinct (x, y) per sample so the batch order is observable.
         x = torch.arange(n, dtype=torch.float32).view(n, 1, 1, 1).expand(n, 3, 4, 4)
         y = torch.arange(n) % 2
@@ -187,9 +182,12 @@ def test_measure_trace_preserves_train_loader_shuffling() -> None:
     _ = [batch[0].clone() for batch in loader_c]  # drain once
     second_pass_no_hvp = [batch[0].clone() for batch in loader_c]
 
-    assert all(torch.equal(a, b) for a, b in zip(observed_first_pass, reference, strict=True))
     assert all(
-        torch.equal(a, b) for a, b in zip(observed_second_pass, second_pass_no_hvp, strict=True)
+        torch.equal(a, b) for a, b in zip(observed_first_pass, reference, strict=True)
+    )
+    assert all(
+        torch.equal(a, b)
+        for a, b in zip(observed_second_pass, second_pass_no_hvp, strict=True)
     ), (
         "measure_trace consumed train_loader's shuffling generator: "
         "subsequent epoch ordering depends on metric_interval_steps."
@@ -197,9 +195,7 @@ def test_measure_trace_preserves_train_loader_shuffling() -> None:
 
 
 def test_trainer_owns_isolated_hvp_loader() -> None:
-    """The HVP loader is a distinct ``DataLoader`` instance sharing the
-    training *dataset* but not the sampler state -- a structural
-    invariant complementing the behavioural test above."""
+    """Use the same training dataset through a separate Hessian-batch loader."""
     train_loader = _sentinel_loader(value=1.0, label=0)
     val_loader = _sentinel_loader(value=0.0, label=1)
     trainer = _build_trainer(train_loader, val_loader)

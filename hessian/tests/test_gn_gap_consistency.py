@@ -17,6 +17,8 @@ from hessian import ExactGNDecomposition, StochasticGNGapEstimator
 
 
 class _Block(nn.Module):
+    """Combine a linear map, optional normalization, and activation."""
+
     def __init__(
         self,
         in_dim: int,
@@ -25,12 +27,14 @@ class _Block(nn.Module):
         *,
         use_layernorm: bool,
     ) -> None:
+        """Initialize the test block in its original parameter order."""
         super().__init__()
         self.linear = nn.Linear(in_dim, out_dim)
         self.norm = nn.LayerNorm(out_dim) if use_layernorm else nn.Identity()
         self.act = act
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """Apply the block to a batch of intermediate features."""
         return self.act(self.norm(self.linear(x)))
 
 
@@ -51,6 +55,7 @@ class PlainMLP(nn.Module):
         activation: str = "gelu",
         use_layernorm: bool = True,
     ) -> None:
+        """Create the smooth or piecewise-linear segmented test network."""
         super().__init__()
         act_cls: type[nn.Module] = {"gelu": nn.GELU, "relu": nn.ReLU}[activation]
 
@@ -65,20 +70,24 @@ class PlainMLP(nn.Module):
         self._depth = depth
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """Evaluate the projection, hidden blocks, and classification head."""
         x = self.projection(x)
         for block in self.blocks:
             x = block(x)
         return self.head(x)
 
     def get_layer_names(self) -> list[str]:
+        """Name the hidden-block measurement points."""
         return [f"block_{i}" for i in range(self._depth)]
 
     def get_segments(self) -> list[Callable[[torch.Tensor], torch.Tensor]]:
+        """Expose forward segments ending at each measurement point and logits."""
         segs: list[Callable[[torch.Tensor], torch.Tensor]] = []
         proj = self.projection
         first_block = self.blocks[0]
 
         def seg0(x: torch.Tensor) -> torch.Tensor:
+            """Combine projection and the first hidden block into one segment."""
             return first_block(proj(x))
 
         segs.append(seg0)
@@ -107,6 +116,7 @@ def _make_data(
 
 
 def test_exact_vs_stochastic_gelu() -> None:
+    """Compare exact and sampled curvature decomposition on a smooth model."""
     device = torch.device("cpu")
     torch.manual_seed(0)
 
@@ -147,6 +157,7 @@ def test_exact_vs_stochastic_gelu() -> None:
 
 
 def test_relu_gap_zero() -> None:
+    """Keep the tensor-curvature gap negligible for a piecewise-linear model."""
     device = torch.device("cpu")
     torch.manual_seed(0)
 
@@ -180,9 +191,11 @@ def test_relu_gap_zero() -> None:
 
 
 def test_reduction_assertion() -> None:
+    """Require the mean-loss normalization assumed by both decompositions."""
     model = PlainMLP(input_dim=32, width=8, depth=3)
 
     bad_loss = nn.CrossEntropyLoss(reduction="sum")
+
     try:
         ExactGNDecomposition(model, bad_loss)
         raise AssertionError("Should have raised ValueError")
